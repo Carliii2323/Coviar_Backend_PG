@@ -60,32 +60,54 @@ func sendResetEmail(email, token string) error {
 		<!DOCTYPE html>
 		<html>
 		<head>
+			<meta charset="UTF-8">
 			<style>
-				body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-				.container { max-width: 600px; margin: 0 auto; padding: 20px; }
+				body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f5f5f5; }
+				.wrapper { background-color: #f5f5f5; padding: 40px 20px; }
+				.container { max-width: 580px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+				.header { background-color: #880D1E; padding: 32px 40px; text-align: center; }
+				.header h1 { color: #ffffff; margin: 0; font-size: 22px; font-weight: bold; letter-spacing: 0.5px; }
+				.header p { color: rgba(255,255,255,0.8); margin: 6px 0 0; font-size: 13px; }
+				.body { padding: 36px 40px; }
+				.body p { margin: 0 0 16px; font-size: 15px; color: #444; }
+				.button-wrap { text-align: center; margin: 28px 0; }
 				.button {
 					display: inline-block;
-					padding: 12px 24px;
-					background-color: #4F46E5;
-					color: white;
+					padding: 14px 36px;
+					background-color: #880D1E;
+					color: #ffffff !important;
 					text-decoration: none;
 					border-radius: 6px;
-					margin: 20px 0;
+					font-size: 15px;
+					font-weight: bold;
+					letter-spacing: 0.3px;
 				}
-				.footer { margin-top: 30px; font-size: 12px; color: #666; }
+				.link-box { background-color: #f8f4f4; border: 1px solid #e8d5d5; border-radius: 4px; padding: 12px 16px; margin: 16px 0; word-break: break-all; font-size: 12px; color: #880D1E; }
+				.expiry { font-size: 13px; color: #880D1E; font-weight: bold; text-align: center; margin: 8px 0 24px; }
+				.footer { border-top: 1px solid #f0e8e8; padding: 20px 40px; text-align: center; font-size: 12px; color: #999; }
 			</style>
 		</head>
 		<body>
-			<div class="container">
-				<h2>Recuperación de Contraseña</h2>
-				<p>Has solicitado restablecer tu contraseña.</p>
-				<p>Haz clic en el siguiente botón para continuar:</p>
-				<a href="%s" class="button">Restablecer Contraseña</a>
-				<p>O copia y pega este enlace en tu navegador:</p>
-				<p style="word-break: break-all;">%s</p>
-				<p><strong>Este enlace expirará en 1 hora.</strong></p>
-				<div class="footer">
-					<p>Si no solicitaste este cambio, ignora este correo.</p>
+			<div class="wrapper">
+				<div class="container">
+					<div class="header">
+						<h1>Recuperación de Contraseña</h1>
+						<p>Corporación Vitivinícola Argentina</p>
+					</div>
+					<div class="body">
+						<p>Has solicitado restablecer la contraseña de tu cuenta en COVIAR.</p>
+						<p>Hacé clic en el siguiente botón para crear una nueva contraseña:</p>
+						<div class="button-wrap">
+							<a href="%s" class="button">Restablecer Contraseña</a>
+						</div>
+						<p style="font-size:13px; color:#777;">Si el botón no funciona, copiá y pegá este enlace en tu navegador:</p>
+						<div class="link-box">%s</div>
+						<p class="expiry">⏱ Este enlace expirará en 1 hora.</p>
+					</div>
+					<div class="footer">
+						<p>Si no solicitaste este cambio, podés ignorar este correo.</p>
+						<p style="margin-top:8px;">&copy; Corporación Vitivinícola Argentina</p>
+					</div>
 				</div>
 			</div>
 		</body>
@@ -120,8 +142,7 @@ func RequestPasswordReset(db *sql.DB) http.HandlerFunc {
 		var userID int
 		err := db.QueryRow("SELECT id_cuenta FROM cuentas WHERE email_login = $1", req.Email).Scan(&userID)
 		if err != nil {
-			// Por seguridad, siempre respondemos lo mismo aunque no exista el email
-			httputil.RespondJSON(w, http.StatusOK, passwordResetResponse{true, "Si el email existe, recibirás un correo de recuperación"})
+			httputil.RespondJSON(w, http.StatusNotFound, passwordResetResponse{false, "El correo ingresado no está registrado en el sistema"})
 			return
 		}
 
