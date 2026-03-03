@@ -1,0 +1,33 @@
+0000000000000000000000000000000000000000 09032cf544edcf89a45b36ff0d4dfb5b1ff37ae6 Carlii <tu_email@example.com> 1770074171 -0300	clone: from https://github.com/Carliii2323/Coviar_Backend
+09032cf544edcf89a45b36ff0d4dfb5b1ff37ae6 e66ce609e800af482990dda0a2d7fa24dedd5ec4 Carlii <tu_email@example.com> 1770074292 -0300	checkout: moving from main to develop
+e66ce609e800af482990dda0a2d7fa24dedd5ec4 09032cf544edcf89a45b36ff0d4dfb5b1ff37ae6 Carlii <tu_email@example.com> 1770074413 -0300	checkout: moving from develop to main
+09032cf544edcf89a45b36ff0d4dfb5b1ff37ae6 e66ce609e800af482990dda0a2d7fa24dedd5ec4 Carlii <tu_email@example.com> 1770074425 -0300	reset: moving to develop
+e66ce609e800af482990dda0a2d7fa24dedd5ec4 bb2f0b3feb5ea722c059f61eb93668b0353aa259 Carlii <tu_email@example.com> 1770074588 -0300	commit: Pull Request Main
+bb2f0b3feb5ea722c059f61eb93668b0353aa259 e66ce609e800af482990dda0a2d7fa24dedd5ec4 Carlii <tu_email@example.com> 1770078023 -0300	checkout: moving from main to develop
+e66ce609e800af482990dda0a2d7fa24dedd5ec4 bb2f0b3feb5ea722c059f61eb93668b0353aa259 Carlii <tu_email@example.com> 1770078034 -0300	checkout: moving from develop to main
+bb2f0b3feb5ea722c059f61eb93668b0353aa259 e66ce609e800af482990dda0a2d7fa24dedd5ec4 Carlii <tu_email@example.com> 1770078086 -0300	checkout: moving from main to develop
+e66ce609e800af482990dda0a2d7fa24dedd5ec4 bb2f0b3feb5ea722c059f61eb93668b0353aa259 Carlii <tu_email@example.com> 1770078091 -0300	reset: moving to main
+bb2f0b3feb5ea722c059f61eb93668b0353aa259 a80d9f512d221073bffe54cd5cf65b9395ba15a2 Carlii <tu_email@example.com> 1770078141 -0300	commit: Recuperar Contraseña y endpoints de configuración
+a80d9f512d221073bffe54cd5cf65b9395ba15a2 db8c9daa651f661d62959108df5413f4221295fd Carlii <tu_email@example.com> 1770078539 -0300	commit: Arreglo de DTOS
+db8c9daa651f661d62959108df5413f4221295fd cd9a6110d3d3698b451e79582de7f9e8b9d75c81 Carlii <tu_email@example.com> 1770093187 -0300	commit: Integracón Frontend
+cd9a6110d3d3698b451e79582de7f9e8b9d75c81 cd9a6110d3d3698b451e79582de7f9e8b9d75c81 Carlii <tu_email@example.com> 1770349924 -0300	checkout: moving from develop to develop
+cd9a6110d3d3698b451e79582de7f9e8b9d75c81 cb38e23b7519d1526065a79bc17ac5bbcdfc6d26 Carlii <tu_email@example.com> 1770349934 -0300	pull origin develop: Fast-forward
+cb38e23b7519d1526065a79bc17ac5bbcdfc6d26 a1f28aaea54c762da81e72a481abe1c9933f9f20 Carlii <tu_email@example.com> 1770675077 -0300	pull origin develop: Fast-forward
+a1f28aaea54c762da81e72a481abe1c9933f9f20 a1f28aaea54c762da81e72a481abe1c9933f9f20 Carlii <tu_email@example.com> 1770938776 -0300	checkout: moving from develop to develop
+a1f28aaea54c762da81e72a481abe1c9933f9f20 a1f28aaea54c762da81e72a481abe1c9933f9f20 Carlii <tu_email@example.com> 1770938806 -0300	checkout: moving from develop to backup/backend-antes-update-20260212-2026
+a1f28aaea54c762da81e72a481abe1c9933f9f20 d472827610296c192b460ff1ead180e6567e0e4a Carlii <tu_email@example.com> 1770938819 -0300	commit: backup: cambios locales antes de actualizar develop
+d472827610296c192b460ff1ead180e6567e0e4a a1f28aaea54c762da81e72a481abe1c9933f9f20 Carlii <tu_email@example.com> 1770938825 -0300	checkout: moving from backup/backend-antes-update-20260212-2026 to develop
+a1f28aaea54c762da81e72a481abe1c9933f9f20 a1f28aaea54c762da81e72a481abe1c9933f9f20 Carlii <tu_email@example.com> 1770938894 -0300	checkout: moving from develop to develop
+a1f28aaea54c762da81e72a481abe1c9933f9f20 a1f28aaea54c762da81e72a481abe1c9933f9f20 Carlii <tu_email@example.com> 1770938948 -0300	checkout: moving from develop to develop
+a1f28aaea54c762da81e72a481abe1c9933f9f20 d472827610296c192b460ff1ead180e6567e0e4a Carlii <tu_email@example.com> 1770939087 -0300	checkout: moving from develop to backup/backend-antes-update-20260212-2026
+d472827610296c192b460ff1ead180e6567e0e4a d472827610296c192b460ff1ead180e6567e0e4a Carlii <tu_email@example.com> 1770939111 -0300	checkout: moving from backup/backend-antes-update-20260212-2026 to backup/backend-antes-update-20260212-2026
+d472827610296c192b460ff1ead180e6567e0e4a d472827610296c192b460ff1ead180e6567e0e4a Carlii <tu_email@example.com> 1770939141 -0300	checkout: moving from backup/backend-antes-update-20260212-2026 to admin-reinicio
+d472827610296c192b460ff1ead180e6567e0e4a a1f28aaea54c762da81e72a481abe1c9933f9f20 Carlii <tu_email@example.com> 1770939265 -0300	checkout: moving from admin-reinicio to develop
+a1f28aaea54c762da81e72a481abe1c9933f9f20 08f8551723b09e3ac6eb99a5a38e74c3760bec63 Carlii <tu_email@example.com> 1770947538 -0300	commit: Actualiación Admin Endpoints
+08f8551723b09e3ac6eb99a5a38e74c3760bec63 4bc7bc4c7bc92c459eb5719202b83adbe626f4a9 Carlii <tu_email@example.com> 1770947924 -0300	commit: Arreglo endpoint Historial
+4bc7bc4c7bc92c459eb5719202b83adbe626f4a9 c976cea08e174a411330aa31a1c3ad714966271e Carlii <tu_email@example.com> 1771451630 -0300	pull origin: Fast-forward
+c976cea08e174a411330aa31a1c3ad714966271e a6d86c4c02cf63aedab8c87ba6b8a60bde48bfd2 Carlii <tu_email@example.com> 1771460851 -0300	commit: Actualización endpoints creación de PDF y CSV - Actualización Endpoints Historial
+a6d86c4c02cf63aedab8c87ba6b8a60bde48bfd2 85319ea898904a3c86d4c53a4f3cdb9ffc0904aa Carlii <tu_email@example.com> 1771524075 -0300	commit: Creación de endpoint para gestion de bodegas en Admin
+85319ea898904a3c86d4c53a4f3cdb9ffc0904aa b5f4bc6666f1fc8c18b7d07024ab7ae8cb12f225 Carlii <tu_email@example.com> 1771690094 -0300	pull origin develop: Fast-forward
+b5f4bc6666f1fc8c18b7d07024ab7ae8cb12f225 c4f6619d95e8c56a128f08d3bed19fa3d418acc0 Carlii <tu_email@example.com> 1771698051 -0300	commit: Arreglos de endpoints para la gestión de admin
+c4f6619d95e8c56a128f08d3bed19fa3d418acc0 db50211c96eff4790264ba32a90bd42cc53c7ab3 Carlii <tu_email@example.com> 1772509210 -0300	commit: Actualización mail recuperar contraseña

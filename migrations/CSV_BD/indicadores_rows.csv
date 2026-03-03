@@ -1,0 +1,43 @@
+id_indicador,id_capitulo,nombre,descripcion,orden
+1,1,Indicador 1.1,Tendencias del turismo vitivinícola,1
+2,1,Indicador 1.2,Necesidades y expectativas de las partes interesadas,2
+3,2,Indicador 2.1,Política y comunicación de la sostenibilidad enoturística,1
+4,2,Indicador 2.2,Sistema de gestión de la sostenibilidad enoturística,2
+5,2,Indicador 2.3,Estructura a cargo de la sostenibilidad con enfoque enoturístico,3
+6,2,Indicador 2.4,Reportes de sostenibilidad enoturística,4
+7,3,Indicador 3.1,Requisitos legales,1
+8,4,Indicador 4.1,Satisfacción y beneficios para la comunidad,1
+9,4,Indicador 4.2,Acceso de la comunidad a los recursos enoturísticos,2
+10,4,Indicador 4.3,Inversión en la comunidad con relación al enoturismo sostenible,3
+11,4,Indicador 4.4,Fortalecimiento de actividades complementarias de la comunidad,4
+12,5,Indicador 5.1,Información brindada al turista,1
+13,5,Indicador 5.2,Gestión de la calidad enoturística,2
+14,5,Indicador 5.3,Gestión de la calidad enoturística en actividades complementarias,3
+15,6,Indicador 6.1,Programas de acceso a personas con discapacidad,1
+16,7,Indicador 7.1,Protección de turistas ante riesgos ambientales,1
+17,7,Indicador 7.2,Prevención de intoxicaciones menores,2
+18,7,Indicador 7.3,Gestión de manipuladores de alimentos externos,3
+19,7,Indicador 7.4,Oferta de menús especiales,4
+20,7,Indicador 7.5,Consumo responsable de alcohol,5
+21,7,Indicador 7.6,Seguridad en la bodega,6
+22,7,Indicador 7.7,Instalaciones sanitarias,7
+23,7,Indicador 7.8,Asistencia médica de urgencia a turistas,8
+24,8,Indicador 8.1,Cumplimiento de derechos laborales y promoción laboral,1
+25,8,Indicador 8.2,Satisfacción del público interno,2
+26,8,Indicador 8.3,Compromiso con el desarrollo de competencias vinculadas a la atención enoturística,3
+27,8,Indicador 8.4,Promoción de la equidad laboral y la diversidad,4
+28,8,Indicador 8.5,Salud y seguridad en el trabajo,5
+29,8,Indicador 8.6,Público interno residente en la comunidad,6
+30,8,Indicador 8.7,Trabajo temporal vinculado al enoturismo,7
+31,8,Indicador 8.8,Desarrollo de competencias en sostenibilidad enoturística,8
+32,8,Indicador 8.9,Transporte amigable con el ambiente,9
+33,9,Indicador 9.1,Conservación del patrimonio cultural local,1
+34,10,Indicador 10.1,Gestión y reducción del uso de la energía,1
+35,10,Indicador 10.2,Gestión y reducción del uso de agua,2
+36,10,Indicador 10.3,Mantenimiento de jardines y espacios verdes,3
+37,10,Indicador 10.4,Educación en el uso del agua,4
+38,11,Indicador 11.1,"Reducción, separación y disposición selectiva de residuos",1
+39,12,Indicador 12.1,Impactos de eventos turísticos,1
+40,13,Indicador 13.1,Desarrollo de rutas y circuitos enoturísticos,1
+41,13,Indicador 13.2,Diversidad de experiencias enoturísticas,2
+42,14,Indicador 14.1,Segmentación de clientes,1

@@ -1,0 +1,169 @@
+id_nivel_respuesta,id_indicador,nombre,descripcion,puntos,posicion
+1,1,Mínimo no alcanzado,,0,4
+2,2,Mínimo no alcanzado,,0,4
+3,3,Mínimo no alcanzado,,0,4
+4,4,Mínimo no alcanzado,,0,4
+5,5,Mínimo no alcanzado,,0,4
+6,6,Mínimo no alcanzado,,0,4
+7,7,Mínimo no alcanzado,,0,4
+8,8,Mínimo no alcanzado,,0,4
+9,9,Mínimo no alcanzado,,0,4
+10,10,Mínimo no alcanzado,,0,4
+11,11,Mínimo no alcanzado,,0,4
+12,12,Mínimo no alcanzado,,0,4
+13,13,Mínimo no alcanzado,,0,4
+14,14,Mínimo no alcanzado,,0,4
+15,15,Mínimo no alcanzado,,0,4
+16,16,Mínimo no alcanzado,,0,4
+17,17,Mínimo no alcanzado,,0,4
+18,18,Mínimo no alcanzado,,0,4
+19,19,Mínimo no alcanzado,,0,4
+20,20,Mínimo no alcanzado,,0,4
+21,21,Mínimo no alcanzado,,0,4
+22,22,Mínimo no alcanzado,,0,4
+23,23,Mínimo no alcanzado,,0,4
+24,24,Mínimo no alcanzado,,0,4
+25,25,Mínimo no alcanzado,,0,4
+26,26,Mínimo no alcanzado,,0,4
+27,27,Mínimo no alcanzado,,0,4
+28,28,Mínimo no alcanzado,,0,4
+29,29,Mínimo no alcanzado,,0,4
+30,30,Mínimo no alcanzado,,0,4
+31,31,Mínimo no alcanzado,,0,4
+32,32,Mínimo no alcanzado,,0,4
+33,33,Mínimo no alcanzado,,0,4
+34,34,Mínimo no alcanzado,,0,4
+35,35,Mínimo no alcanzado,,0,4
+36,36,Mínimo no alcanzado,,0,4
+37,37,Mínimo no alcanzado,,0,4
+38,38,Mínimo no alcanzado,,0,4
+39,39,Mínimo no alcanzado,,0,4
+40,40,Mínimo no alcanzado,,0,4
+41,41,Mínimo no alcanzado,,0,4
+42,42,Mínimo no alcanzado,,0,4
+43,1,Nivel 1,"Se informa sobre las tendencias y necesidades (en términos legales, tecnológicos, de competitividad, de mercado u otras) de los visitantes con relación al turismo en general, al turismo sostenible o específicamente al enoturismo sostenible nivel de su principal segmento de enoturistas (nacionales, internacionales, jóvenes, adultos, etc.).",1,1
+44,1,Nivel 2,"Tiene registrado o documentado las necesidades y expectativas de los visitantes que disfrutan de las actividades turísticas con relación al turismo sostenible y utiliza tales datos para desarrollar sus prácticas, planes o estrategias de sostenibilidad turística.",2,2
+45,1,Nivel 3,Tiene establecido un plan de acción estratégica alineado específicamente a las tendencias en sostenibilidad turística o enoturística.,3,3
+46,2,Nivel 1,Tiene identificado las partes interesadas relevantes de su actividad turística sostenible.,1,1
+47,2,Nivel 2,"Mantiene vínculos con estas partes interesadas relevantes y ha determinado sus necesidades y expectativas, tanto implícitas como explícitas, declaradas u obligatorias respecto a la sostenibilidad.",2,2
+48,2,Nivel 3,Tiene priorizado y planificado acciones concretas para atender las necesidades y expectativas de sus partes interesadas relevantes a la actividad turística sostenible.,3,3
+49,3,Nivel 1,"Tiene definida una política de sostenibilidad turística, que se plasma en una gestión sostenible que incluye objetivos medibles y considera la dimensiones de sostenibilidad económica, social y ambiental beneficios para la comunidad local, calidad en el empleo del personal turístico, equidad social en la distribución de los beneficios captados por el turismo, formas de satisfacción y protección de los turistas, relaciones e involucramiento con la comunidad, protección del patrimonio local, aspectos ambientales, calidad turística, etc.",1,1
+50,3,Nivel 2,La política de sostenibilidad turística es comunicada y revisada internamente (al público interno de la organización).,2,2
+51,3,Nivel 3,"La organización tiene un plan de comunicación y revisión periódica que involucre a y está disponible para todas las partes interesadas (turistas, proveedores, etc.).",3,3
+52,4,Nivel 1,Tiene identificado los principios fundamentales o aspectos que considera pueden desarrollarse con vistas a un turismo vitivinícola sostenible y de acuerdo a su propias necesidades y oportunidades.,1,1
+53,4,Nivel 2,Tiene establecido algún procedimiento de revisión de la política de sostenibilidad turística. Teniendo en cuenta la retroalimentación que obtiene de la comunicación y las demandas del contexto.,2,2
+54,4,Nivel 3,"Tiene formalizado o documentado con claridad un sistema de gestión de la sostenibilidad con alcance a las actividades turísticas identificando objetivos, procesos, roles, responsabilidades y recursos necesarios para desarrollar un turismo sostenible y abordar las necesidades y expectativas de las partes interesadas relevantes a ellas.",3,3
+55,5,Nivel 1,Tiene una persona responsable de gestionar a nivel organizacional los temas generales de la sostenibilidad ambiental y social que incluya aspectos relacionados al turismo sostenible.,1,1
+56,5,Nivel 2,Tiene un equipo (departamento o área) responsable de gestionar todos los temas de sostenibilidad de la organización con alcance a los aspectos relacionados al turismo sostenible.,2,2
+57,5,Nivel 3,"Tiene una persona responsable o un equipo formado y capacitado que pertenezca al área de turismo y con roles y responsabilidad claras en cuanto a la planificación, evaluación de riesgos y oportunidades, seguimiento de acciones de la sostenibilidad turística, diálogo con las partes interesadas relevantes, mejora continua de los servicios turísticos, aseguramiento de la política de sostenibilidad turística, etc.",3,3
+58,6,Nivel 1,"Comunica a aquellas partes interesadas pertinentes a la actividad turística (internas y externas) y de diversas formas sus políticas, prácticas o acciones de sostenibilidad enoturística.",1,1
+59,6,Nivel 2,Ha desarrollado y comunicado al menos una vez un Reporte de Sostenibilidad que incluya la actividad de enoturismo.,2,2
+60,6,Nivel 3,"Desarrolla Reportes de Sostenibilidad con alguna metodología conocida (por ejemplo, siguiendo los estándares de GRI) y con una frecuencia establecida que incluyan información detallada de sostenibilidad económica, social y ambiental que incluya la actividad turística.",3,3
+61,7,Nivel 1,"Cumple con todos los requisitos, licencias, habilitaciones de tipo legales, tanto municipales, provinciales y nacionales aplicables a la actividad turística en general y enoturística en particular.",1,1
+62,7,Nivel 2,"Promueve el cumplimiento de la legislación vigente o la creación de nuevas normativas para regular las actividades enoturísticas y del turismo en general para el destino (por ejemplo, participación en cámaras, entes de turismo, asociaciones, etc.).",2,2
+63,7,Nivel 3,"Tiene una política general explícita sobre valores, ética e integridad con alcance específicamente a las actividades de turismo.",3,3
+64,8,Nivel 1,"Tiene conocimientos sobre reclamos, quejas, percepciones, inquietudes y/o propuestas por parte de la comunidad o de otras partes interesadas, sobre cuestiones referidas al enoturismo o al desarrollo turístico de su zona de influencia.",1,1
+65,8,Nivel 2,"Tiene registros de las mejoras necesarias de realizar en espacios comunitarios propuestas por parte de la comunidad o de otras partes interesadas, al mismo tiempo que brinden mejores servicios a los turistas.",2,2
+66,8,Nivel 3,"Tiene un plan formal y con gestión presupuestaria para gestionar los aspectos que la comunidad considera positivos y negativos, respecto de la actividad enoturística.",3,3
+67,9,Nivel 1,Promueve en la comunidad local el acceso a los servicios turísticos que se brindan estableciendo promociones diferenciales y segmentadas hacia diferentes públicos.,1,1
+68,9,Nivel 2,"Tiene establecido beneficios diferenciados de las actividades turísticas que se brindan para la comunidad de la zona o de la región (visitas con degustación, menús especiales, eventos, etc.).",2,2
+69,9,Nivel 3,Tiene establecido en su política de sostenibilidad turística la promoción en la comunidad local sobre el acceso a las actividades turísticas.,3,3
+70,10,Nivel 1,Realiza mejoras eventuales en infraestructura y/o servicios públicos en la comunidad relacionados específicamente a mejorar las prestaciones a los turistas.,1,1
+71,10,Nivel 2,Tiene definido un presupuesto anual en función de los ingresos que genera el turismo para destinarlo a la mejora de la infraestructura y/o servicios públicos de la comunidad y con ello asumir el compromiso con el turismo sostenible.,2,2
+72,10,Nivel 3,Realiza acciones o genera alianzas con el sector público y otras organizaciones para apoyar iniciativas de mejora de la infraestructura turística y/o servicios públicos y desarrollo de negocios locales de la comunidad relacionados al turismo sostenible.,3,3
+73,11,Nivel 1,"Apoya (destinando recursos) a los actores comunitarios o emprendedores locales en la prestación de servicios, suministros de insumos, actividades complementarias o negocios locales que puedan brindarse a los turistas.",1,1
+74,11,Nivel 2,Promueve entre sus turistas el acceso a los servicios que brinda la comunidad.,2,2
+75,11,Nivel 3,Tiene planes de capacitación y formación profesional para los actores de la comunidad en alianzas con otras instituciones en cuanto a la prestación de servicios turísticos o de abastecimiento complementarios a la bodega.,3,3
+76,12,Nivel 1,"Tiene un sistema de comunicación e información accesible para los turistas sobre las actividades, experiencias y servicios enoturísticos que se brindan.",1,1
+77,12,Nivel 2,Tiene un mecanismo para atender aquellos aspectos de insatisfacción que ocurren por problemas de una comunicación errónea o no intencional.,2,2
+78,12,Nivel 3,"Tiene un procedimiento de revisión y actualización constante sobre los medios de comunicación e información que brinda al turista, evitando contenidos erróneos o engañosos.",3,3
+79,13,Nivel 1,Tiene formalizado un cuestionario que mida la satisfacción de los visitantes con relación al conjunto de prestaciones turísticas enoturísticas que se contrataron.,1,1
+80,13,Nivel 2,Tiene un procedimiento de análisis de las datos e información recibida para brindar respuestas y/o retribución a los turistas.,2,2
+81,13,Nivel 3,"Tiene establecido y documentado un sistema de gestión de la calidad turística que incluya la descripción de los servicios que presta, requisitos e indicadores de valoración de la calidad asociados, perfiles de clientes, mecanismos de monitoreo de estos requisitos, mejora continua, atención y respuesta al cliente, número de clientes que vuelven a la bodega, capacitación del personal, etc.",3,3
+82,14,Nivel 1,Promueve actividades turísticas complementarias a las que puede acceder el turista antes o después de visitar la bodega.,1,1
+83,14,Nivel 2,"Tiene establecido alianzas de cooperación con aquellas partes interesadas al turismo vitivinícola que permita discutir las mejoras en la prestación de los servicios complementarios a los que accede el turista en su recorrida por bodegas, lugares, destinos, etc.",2,2
+84,14,Nivel 3,Tiene un registro y procedimiento para el análisis de los datos e información de las actividades y acciones de trabajo en conjunto del resto de la cadena de valor del turismo vitivinícola e incluso con la comunidad.,3,3
+85,15,Nivel 1,"Tiene un sistema de infraestructura que facilite el desplazamiento de personas con movilidad reducida (por ejemplo: ascensores, rampas o entradas a las instalaciones sin desniveles, barras de seguridad, baños equipados para estas necesidades, etc.).",1,1
+86,15,Nivel 2,Tiene una política turística que incluya las necesidades específicas de este público y programas turísticos planificados específicamente para personas con capacidades especiales.,2,2
+87,15,Nivel 3,"Tiene un plan de desarrollo turístico para personas con capacidades especiales o movilidad reducida diseñados en conjunto y en alianzas con gobiernos locales e instituciones relacionadas, proveedores turísticos y de transporte, instituciones de salud y emergencias, que aborden las múltiples necesidades de este público.",3,3
+88,16,Nivel 1,Informa a sus visitantes sobre la probabilidad de ocurrencia de eventos climáticos extremos en áreas rurales cercanos a la bodega y la necesidad de estar prevenidos y atentos a las alertas meteorológicas.,1,1
+89,16,Nivel 2,Tiene un plan de contingencias sobre riesgos ambientales para prevenir y atender accidentes o emergencias que ocurran en la bodega y/o los alrededores que visitan los turistas.,2,2
+90,16,Nivel 3,Tiene un procedimiento donde ha identificado riesgos ambientales frecuentes y potenciales que puedan afectar las áreas de la bodega y sus cercanías y un sistema de alerta y comunicación.,3,3
+91,17,Nivel 1,"Tiene establecido pautas mínimas de manipulación, preparación y conservación de los alimentos que brinda a los turistas.",1,1
+92,17,Nivel 2,"Tiene asesoramiento de un profesional competente, por ejemplo, un bromatólogo, en cuanto a los requisitos mínimos de cumplimiento para la manipulación, preparación y conservación de los alimentos preparados en la bodega.",2,2
+93,17,Nivel 3,Tiene un sistema implementado y/o de calidad e inocuidad de los alimentos preparados en la bodega con alcance a las actividades enoturísticas.,3,3
+94,18,Nivel 1,"Tiene establecido los requisitos mínimos de manipulación, preparación y distribución de materias primas y/o alimentos que apliquen a los proveedores de alimentos externos a la bodega.",1,1
+95,18,Nivel 2,"Articula o implementa capacitaciones para proveedores de alimentos y/o materias primas, incluso los proveedores de la comunidad cercana a la bodega, respecto a los requisitos de manipulación de los mismos.",2,2
+96,18,Nivel 3,"Tiene un procedimiento de gestión de la inocuidad de los alimentos y/o materias primas con alcance a los proveedores externos a la bodega que incluya, por ejemplo, auditorías a los proveedores.",3,3
+97,19,Nivel 1,Tiene menús diferenciados para celíacos (sin TACC),1,1
+98,19,Nivel 2,"Tiene menús diferenciados para celíacos, vegetarianos o veganos",2,2
+99,19,Nivel 3,"Tiene al menos dos menús diferenciados para celiacos, vegetarianos o veganos.",3,3
+100,20,Nivel 1,Brinda algún tipo de información o realiza acciones comunicativas sobre el consumo responsable de alcohol.,1,1
+101,20,Nivel 2,Brinda de manera opcional instrumentos de medición de alcohol en sangre para turistas (alcoholímetro o test de alcoholemia descartable). Brindar algún sistema de transporte opcional para aquellos turistas que han consumido alcohol en la bodega.,2,2
+102,20,Nivel 3,Tiene una política clara sobre el consumo responsable de alcohol.,3,3
+103,21,Nivel 1,Tiene un sistema de información y/o capacitación para el turista en caso de visitar las áreas de producción de uva y/o elaboración de vino.,1,1
+104,21,Nivel 2,Tiene señalización adecuada en cuanto a seguridad para el turista en caso de visitar las áreas de producción de uva y/o elaboración de vino.,2,2
+105,21,Nivel 3,Tiene un sistema de gestión de la salud y seguridad implementado y/o certificado con alcance al área de turismo y los visitantes y que incluya capacitación del público interno afectado al turismo.,3,3
+106,22,Nivel 1,Tiene sanitarios en condiciones adecuadas y limpios que puedan utilizar los turistas.,1,1
+107,22,Nivel 2,"Tiene instalaciones sanitarias adecuadas, en cantidad suficiente y diferenciadas para hombres y mujeres.",2,2
+108,22,Nivel 3,Tiene instalaciones sanitarias adaptadas para personas con discapacidad.,3,3
+109,23,Nivel 1,Tiene un plan de capacitación del público interno que se encuentra afectado al turismo en primeros auxilios y/o formación paramédica como RCP (Reanimación Cardio Pulmonar).,1,1
+110,23,Nivel 2,Tiene contratado un servicio coordinado de emergencia.,2,2
+111,23,Nivel 3,Se dispone de un cardiodesfibrilador y oxígeno y personal capacitado para su utilización.,3,3
+112,24,Nivel 1,"Cumple con todas las obligaciones legales en materia laboral en cuanto a salarios y beneficios para el público interno vinculado al turismo y con alcance a todas las actividades que ofrece (gastronómicas, hospedajes, visitas, festivales, etc.), por ejemplo un Convenio Colectivo de Trabajo. Tiene registros en cuanto al respeto del cumplimiento de las jornadas laborales atendiendo tanto a la remuneración como a la duración de la misma establecida por el convenio colectivo de trabajo (aplicable a casos de trabajadores sindicalizados). Por ejemplo, lleva registros de jornadas laborales de sus empleados. Puede evidenciarlo con el Formulario 931.",1,1
+113,24,Nivel 2,"Tiene una política formalizada de mejoras en las remuneraciones y beneficios para su público interno que acompañe el crecimiento de la actividad turística sostenible incluyendo a sus familiares, sobre todo en trabajadores de la comunidad como mejoras en prestaciones de salud, salarios, prestaciones de salud, premios, viáticos, almuerzo, becas de estudio para empleados y sus hijos, opciones de recreación, capacitación, etc.",2,2
+114,24,Nivel 3,Participa de organizaciones empresarias y/o sindicales vinculadas a la actividad turística donde se discuta los aspectos referidos a los trabajadores del turismo en general y en la sostenibilidad en particular.,3,3
+115,25,Nivel 1,Tiene un registro que cuantifique la rotación de personal en puestos asociados a la actividad turística.,1,1
+116,25,Nivel 2,"Tiene implementado un instrumento que mida la percepción del personal turístico en cuanto al clima laboral, la formación profesional y la política de beneficios que se ofrecen.",2,2
+117,25,Nivel 3,Tiene una política formalizada de asignación de recursos presupuestarios específicamente vinculado al desarrollo del público interno afectado a las actividades turísticas sostenibles.,3,3
+118,26,Nivel 1,Tiene registros de capacitaciones realizadas en función del plan anual de capacitaciones en el cual se incluya específicamente lo referido a turismo sostenible.,1,1
+119,26,Nivel 2,"Tiene un plan anual de capacitaciones, entrenamientos y mejoras en las competencias relacionadas a la prestación de servicios turísticos sostenibles.",2,2
+120,26,Nivel 3,"Tiene documentado y/o registrado la promoción, apoyo y seguimiento del personal de turismo en cuanto a la realización de capacitaciones internas y externas, orientadas al turismo sostenible, y los resultados obtenidos (por ejemplo, otorgamiento de becas, liberación de horas para realizar cursos, % de culminación satisfactoria de la capacitación, etc.).",3,3
+121,27,Nivel 1,"Tiene un procedimiento de vinculación que promueva explícitamente la equidad laboral, la diversidad y la no discriminación de ningún tipo entre su público interno vinculado al turismo. Por ejemplo, contrata eventualmente, entre su planta de personal vinculado al turismo, personas con discapacidad que pueden responsabilizarse por las tareas relacionadas a su puesto laboral.",1,1
+122,27,Nivel 2,"Tiene indicadores que puedan evidenciar el grado de equidad y diversidad laboral (por ejemplo, cantidad de mujeres y hombres, personal de origen no argentino, diferencias en los salarios percibidos entre hombre y mujeres, proporción de puestos gerenciales ocupados por hombre y mujeres, diferencias porcentuales entre el mayor y el menor salario, diferencias de edad, cantidad de personas con discapacidad, etc.).",2,2
+123,27,Nivel 3,"Tiene una política formalizada (explícita) de promoción interna de la equidad laboral, la diversidad y la no discriminación en el ámbito de trabajo de su público interno con alcance al área de turismo.",3,3
+124,28,Nivel 1,Cumple con la legislación vigente en Materia de Salud y Seguridad en el Trabajo y con alcance al área de turismo.,1,1
+125,28,Nivel 2,Tiene una política formalizada y con asignación presupuestaria para el desarrollo de la salud y seguridad en sus ámbitos internos de trabajo con alcance al área de turismo.,2,2
+126,28,Nivel 3,"Tiene implementado y/o certificado un sistema de gestión en materia de salud y seguridad laboral (por ejemplo, ISO 45001, OHSAS 18001, SA8000) que incluya las áreas y puestos de trabajo vinculados al área de turismo y a visitantes externos.",3,3
+127,29,Nivel 1,"Tiene registros de la proporción de empleo total, afectados a la actividad turística, con relación al empleo cubierto por personas que residen en la comunidad local.",1,1
+128,29,Nivel 2,Tiene personal vinculado al área de turismo que reside en la comunidad vecina.,2,2
+129,29,Nivel 3,"Tiene una política de priorización, promoción, desarrollo e inversión social en personas que vivan en la comunidad cercana a la bodega, que puedan cubrir puestos laborales vinculados al turismo.",3,3
+130,30,Nivel 1,Tiene contratado trabajadores temporales de manera formal.,1,1
+131,30,Nivel 2,Tiene establecido indicadores de relación entre trabajadores temporales respecto a trabajadores en relación de dependencia y evalúa posibilidades de reducir este índice.,2,2
+132,30,Nivel 3,"Brinda a los empleados tercerizados las mismas o similares condiciones de trabajo que a empleados permanentes en cuanto a salud y seguridad laboral, prestación de elementos de seguridad, prestaciones de baños y agua potable, lugares para merienda, almuerzo y descanso.",3,3
+133,31,Nivel 1,"Brinda capacitaciones al público interno relacionadas con el desarrollo sostenible y su relación con la sostenibilidad turística, o bien difunde entre los empleados capacitaciones externas y/o libera horas para su realización en esta temática. Por ejemplo, tiene un plan anual de capacitaciones, entrenamientos y mejoras en las competencias relacionadas a la prestación de servicios turísticos sostenibles.",1,1
+134,31,Nivel 2,Promueve entre su público interno propuestas y acciones de mejora relacionadas a la sostenibilidad de las actividades turísticas.,2,2
+135,31,Nivel 3,Tiene una política formalizada con asignación presupuestaria para el desarrollo de innovaciones por parte de su público interno que contribuyan a la sostenibilidad turística en sus diferentes dimensiones.,3,3
+136,32,Nivel 1,Promueve entre sus turistas u otras partes interesadas el uso de transporte alternativo para la llegada y salida de la bodega.,1,1
+137,32,Nivel 2,"Promueve las opciones de transporte alternativo (por ejemplo, alquiler de bicicletas, autos compartidos, recogidas conjuntas) para los visitantes y también entre su público interno. En este último caso las posibilidades de teletrabajo contribuyen a una menor utilización de movilidad.",2,2
+138,32,Nivel 3,Tiene un plan de acción que incluya formas de reducir el uso de transporte desde las operaciones diarias de la bodega hasta el uso por visitantes y público interno.,3,3
+139,33,Nivel 1,Comunica entre sus públicos de interés y en algún sitio promocional el valor que aportan los monumentos históricos y la necesidad de su cuidado y conservación como elementos diferenciadores de destinos turísticos.,1,1
+140,33,Nivel 2,"Promueve entre su público interno y de la comunidad cercana el voluntariado para el conocimiento, la conservación y el mantenimiento de estructuras e hitos culturales.",2,2
+141,33,Nivel 3,Organiza o promueve actividades en conjunto con otros actores del turismo u otras bodegas para invertir en la conservación y mantenimiento del patrimonio cultural local.,3,3
+142,34,Nivel 1,"Tiene registros que permitan estimar las actividades, procesos o sectores vinculados al área de turismo en cuanto al tipo de energía consumida y su cantidad.",1,1
+143,34,Nivel 2,"Tiene dispositivos que ayuden a reducir el uso de la energía (interrupción automática de la energía, sensores de movimiento, luminaria led, etc.) Realiza un mantenimiento periódico de todos los equipos que consumen energía vinculados al área, sector o actividades de turismo (limpieza de filtros en aires acondicionados o equipos de refrigeración, limpieza de lámparas, mantenimiento de hornos, mantenimientos de heladeras, etc.).",2,2
+144,34,Nivel 3,"Tiene un plan con asignación presupuestaria de corto y mediano plazo para incorporar energías renovables de manera parcial o total en las áreas, actividades o sectores asociados al turismo o reemplazar equipos y/o artefactos por otros de menor consumo de energía (iluminación y artefactos de bajo consumo, refrigeradores de bajo consumo, etc.).",3,3
+145,35,Nivel 1,"Tiene registros que permitan estimar las actividades, procesos o sectores vinculados al área de turismo en cuanto al consumo de agua.",1,1
+146,35,Nivel 2,"Tiene sistemas de reducción del agua para las actividades, procesos o sectores vinculados al turismo (por ejemplo: equipos sanitarios con descarga variable o regulación de carga de agua, grifería de corte automático, sistema de reúso).",2,2
+147,35,Nivel 3,"Tiene un plan integral de corto y mediano plazo para reducir el uso de agua de las actividades asociadas al turismo, con inversión presupuestaria, metas e indicadores de medición y reducción, sistema de rehúso del agua, capacitación y educación ambiental incluidos los turistas, etc.",3,3
+148,36,Nivel 1,Tiene registros de consumo de agua necesaria para el riego de los jardines y áreas verdes (principalmente áreas con césped).,1,1
+149,36,Nivel 2,"Tiene un plan de manejo eficiente de riego de los jardines y espacios verdes que contemplen días, duración y horarios de riego en función de las recomendaciones de los organismos de gestión y control del agua (por ejemplo: tecnologías de riego presurizado, uso de agua reciclada, etc.)",2,2
+150,36,Nivel 3,Tiene un plan integral de corto y mediano plazo para reducir los jardines y áreas verdes de la bodega (por ejemplo: generar un paisaje constituido por especies de tipo xerófilas de bajo consumo de agua). Incluye la protección de espacios con vegetación nativa.,3,3
+151,37,Nivel 1,Informa al público interno vinculado al turismo y a los propios turistas sobre la problemática del agua y la necesidad de un uso racional del recurso.,1,1
+152,37,Nivel 2,"Tiene señalética y/o cartelería en las diferentes áreas, sectores y actividades relacionadas al turismo que indiquen un uso racional del agua.",2,2
+153,37,Nivel 3,"Tiene una política general sobre el uso racional del agua y con alcance a todas las actividades, áreas y sectores asociados al turismo.",3,3
+154,38,Nivel 1,"Tiene recipientes diferenciados correctamente y en cantidades adecuadas en las áreas, sectores y actividades relacionadas al turismo, para los distintos tipos de residuos.",1,1
+155,38,Nivel 2,"Realiza una disposición final de los residuos diferencial evitando mezclar los residuos en el proceso de recolección final. Por ejemplo, se ha informado si el municipio realiza una recolección diferenciada de los residuos, ha contactado a recuperadores urbanos para la retirada de los residuos, trasporta los residuos a los lugares indicados de recolección diferenciada.",2,2
+156,38,Nivel 3,"Tiene establecido una política específica de reducción de residuos con alcance a las áreas, sectores o actividades turísticas incluyendo a toda la cadena de valor (clientes, proveedores, público interno, etc.).",3,3
+157,39,Nivel 1,"Tiene registro de los impactos sociales, ambientales y económicos de los eventos que organiza en la bodega. Por ejemplo: eventos Wine Rock, Rally de las bodegas, cosecha de la luna llena, festivales de cosechas, etc.",1,1
+158,39,Nivel 2,Implementa algún tipo de planificación participativa y en conjunto con actores públicos en la organización de eventos para atender las demandas de la comunidad en cuanto a los posibles impactos.,2,2
+159,39,Nivel 3,Realiza acciones de mitigación o remediación de las proximidades a la bodega.,3,3
+160,40,Nivel 1,Participa formalmente de proyectos enoturísticos conformados de manera multisectorial entre actores públicos y privados.,1,1
+161,40,Nivel 2,Es miembro de un circuito o ruta turística donde participen bodegas y otros actores que brinden servicios turísticos.,2,2
+162,40,Nivel 3,"Asigna fondos presupuestarios para el desarrollo de proyectos enoturísticos como rutas, circuitos, mapas, etc.",3,3
+163,41,Nivel 1,"Ofrece más de una experiencia o recurso enoturístico (por ejemplo, degustaciones, visitas guiadas por la bodega, sala de arte, museo, restaurante, etc.).",1,1
+164,41,Nivel 2,Tiene diversidad de experiencias enoturísticas que mantiene durante todo el año (temporada alta y baja).,2,2
+165,41,Nivel 3,"Tiene un plan formal para incorporar nuevas experiencias enoturísticas en función de la demanda, en conjunto con otros actores del sector, pertenezcan o no al rubro vitivinícola.",3,3
+166,42,Nivel 1,"Tiene alguna documentación o registro que evidencie algún tipo de conocimiento o segmentación de visitantes con indicadores de base como la procedencia, rango etario, el gasto, medios de arribo a la bodega, estacionalidad de la demanda, medición de días de mayor ocupación y flujos, etc. que permita gestionar eficientemente la unidad de turismo de la bodega, aspectos de sostenibilidad ambiental o social, etc.",1,1
+167,42,Nivel 2,Promociona o comunica su diversidad de experiencias enoturísticas desde un enfoque de sostenibilidad.,2,2
+168,42,Nivel 3,Gestiona las demandas de sostenibilidad de sus clientes de acuerdo a su diversidad de experiencias enoturísticas que ofrece.,3,3

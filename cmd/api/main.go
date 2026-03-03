@@ -22,13 +22,13 @@ func main() {
 	}
 	log.Println("✓ Configuración cargada")
 
-	// 2. Conectar a Supabase
-	db, err := database.ConnectSupabase(cfg.Supabase.URL, cfg.Supabase.Key, cfg.Supabase.DBPassword)
+	// 2. Conectar a PostgreSQL local
+	db, err := database.ConnectPostgres(cfg.DB.Host, cfg.DB.Port, cfg.DB.User, cfg.DB.Password, cfg.DB.Name)
 	if err != nil {
-		log.Fatalf("❌ Error conectando a Supabase: %v", err)
+		log.Fatalf("❌ Error conectando a PostgreSQL: %v", err)
 	}
 	defer db.Close()
-	log.Println("✓ Conexión a Supabase establecida")
+	log.Println("✓ Conexión a PostgreSQL local establecida")
 
 	// 3. Inicializar repositorios
 	bodegaRepo := postgres.NewBodegaRepository(db.DB)
@@ -189,7 +189,7 @@ func main() {
 	addr := cfg.Server.Host + ":" + cfg.Server.Port
 	log.Printf("🚀 Servidor iniciando en http://%s", addr)
 	log.Printf("📍 Entorno: %s", cfg.App.Environment)
-	log.Printf("🔗 Supabase URL: %s", cfg.Supabase.URL)
+	log.Printf("🗄️  Base de datos: %s@%s:%s/%s", cfg.DB.User, cfg.DB.Host, cfg.DB.Port, cfg.DB.Name)
 	log.Printf("🔐 JWT Secret configurado: %s", maskSecret(cfg.JWT.Secret))
 	log.Printf("🍪 Autenticación basada en cookies HttpOnly habilitada")
 

@@ -10,10 +10,10 @@ import (
 
 // Config contiene toda la configuración de la aplicación
 type Config struct {
-	Server   ServerConfig
-	Supabase SupabaseConfig
-	JWT      JWTConfig
-	App      AppConfig
+	Server ServerConfig
+	DB     DatabaseConfig
+	JWT    JWTConfig
+	App    AppConfig
 }
 
 type ServerConfig struct {
@@ -21,10 +21,12 @@ type ServerConfig struct {
 	Host string
 }
 
-type SupabaseConfig struct {
-	URL        string
-	Key        string
-	DBPassword string
+type DatabaseConfig struct {
+	Host     string
+	Port     string
+	User     string
+	Password string
+	Name     string
 }
 
 type JWTConfig struct {
@@ -47,10 +49,12 @@ func Load() (*Config, error) {
 			Port: getEnv("SERVER_PORT", "8080"),
 			Host: getEnv("SERVER_HOST", "0.0.0.0"),
 		},
-		Supabase: SupabaseConfig{
-			URL:        os.Getenv("SUPABASE_URL"),
-			Key:        os.Getenv("SUPABASE_KEY"),
-			DBPassword: os.Getenv("SUPABASE_DB_PASSWORD"),
+		DB: DatabaseConfig{
+			Host:     getEnv("DB_HOST", "localhost"),
+			Port:     getEnv("DB_PORT", "5432"),
+			User:     getEnv("DB_USER", "coviar_user"),
+			Password: os.Getenv("DB_PASSWORD"),
+			Name:     getEnv("DB_NAME", "coviar_db"),
 		},
 		JWT: JWTConfig{
 			Secret: getEnv("JWT_SECRET", "your_jwt_secret_key_here"),
@@ -60,9 +64,8 @@ func Load() (*Config, error) {
 		},
 	}
 
-	// Validar variables críticas de Supabase
-	if cfg.Supabase.URL == "" || cfg.Supabase.Key == "" || cfg.Supabase.DBPassword == "" {
-		return nil, fmt.Errorf("SUPABASE_URL, SUPABASE_KEY y SUPABASE_DB_PASSWORD son requeridas")
+	if cfg.DB.Password == "" {
+		return nil, fmt.Errorf("DB_PASSWORD es requerida")
 	}
 
 	return cfg, nil

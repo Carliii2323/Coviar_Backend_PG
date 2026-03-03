@@ -1,0 +1,6 @@
+id_segmento,nombre,min_turistas,max_turistas
+1,Micro Bodega Turística / Artesanal,0,999
+2,Pequeña Bodega Turística,1000,4999
+3,Mediana Bodega Turística,5000,14999
+4,Bodega Turística,15000,29999
+5,Gran Bodega Turística,30000,

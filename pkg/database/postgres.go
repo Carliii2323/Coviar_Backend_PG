@@ -9,42 +9,19 @@ import (
 	_ "github.com/lib/pq"
 )
 
+
 type DB struct {
 	*sql.DB
 }
 
-// ConnectSupabase establece conexión con Supabase usando PostgreSQL
-func ConnectSupabase(supabaseURL, supabaseKey, dbPassword string) (*DB, error) {
-	// Extraer project ref de la URL
-	var projectRef string
-	if len(supabaseURL) > 8 {
-		urlWithoutProtocol := supabaseURL[8:]
-		if len(urlWithoutProtocol) > 0 {
-			for i, c := range urlWithoutProtocol {
-				if c == '.' {
-					projectRef = urlWithoutProtocol[:i]
-					break
-				}
-			}
-		}
-	}
+// ConnectPostgres establece conexión con PostgreSQL local
+func ConnectPostgres(host, port, user, password, dbname string) (*DB, error) {
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable connect_timeout=10",
+		host, port, user, password, dbname)
 
-	if projectRef == "" {
-		return nil, fmt.Errorf("no se pudo extraer el project ref de la URL de Supabase")
-	}
-
-	// Configuración del Session Pooler de Supabase
-	// Basado en: postgresql://postgres.jibisagabcbajwgliero:[PASSWORD]@aws-0-us-west-2.pooler.supabase.com:5432/postgres
-	host := "aws-0-us-west-2.pooler.supabase.com"
-	port := 5432
-	user := fmt.Sprintf("postgres.%s", projectRef)
-
-	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=postgres sslmode=require connect_timeout=15",
-		host, port, user, dbPassword)
-
-	fmt.Printf("🔍 Conectando a Supabase Session Pooler...\n")
-	fmt.Printf("   Host: %s:%d\n", host, port)
-	fmt.Printf("   Usuario: %s\n", user)
+	fmt.Printf("Conectando a PostgreSQL local...\n")
+	fmt.Printf("   Host: %s:%s\n", host, port)
+	fmt.Printf("   Usuario: %s / BD: %s\n", user, dbname)
 
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {
@@ -55,16 +32,15 @@ func ConnectSupabase(supabaseURL, supabaseKey, dbPassword string) (*DB, error) {
 	db.SetMaxIdleConns(5)
 	db.SetConnMaxLifetime(5 * time.Minute)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	err = db.PingContext(ctx)
-	if err != nil {
+	if err = db.PingContext(ctx); err != nil {
 		db.Close()
-		return nil, fmt.Errorf("error conectando a Supabase: %w", err)
+		return nil, fmt.Errorf("error conectando a PostgreSQL: %w", err)
 	}
 
-	fmt.Printf("✅ Conexión exitosa a Supabase Session Pooler\n")
+	fmt.Printf("Conexión exitosa a PostgreSQL local\n")
 	return &DB{db}, nil
 }
 

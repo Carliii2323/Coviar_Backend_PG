@@ -1,0 +1,21 @@
+id_nivel_sostenibilidad,id_segmento,nombre,min_puntaje,max_puntaje
+1,1,No alcanza nivel mínimo de sostenibilidad,0,16
+2,1,Nivel mínimo de sostenibilidad,17,38
+3,1,Nivel medio de sostenibilidad,39,45
+4,1,Nivel alto de sostenibilidad,46,51
+5,2,No alcanza nivel mínimo de sostenibilidad,0,22
+6,2,Nivel mínimo de sostenibilidad,23,51
+7,2,Nivel medio de sostenibilidad,52,61
+8,2,Nivel alto de sostenibilidad,62,69
+9,3,No alcanza nivel mínimo de sostenibilidad,0,31
+10,3,Nivel mínimo de sostenibilidad,32,71
+11,3,Nivel medio de sostenibilidad,72,85
+12,3,Nivel alto de sostenibilidad,86,96
+13,4,No alcanza nivel mínimo de sostenibilidad,0,41
+14,4,Nivel mínimo de sostenibilidad,42,93
+15,4,Nivel medio de sostenibilidad,94,112
+16,4,No alcanza nivel mínimo de sostenibilidad,113,126
+17,5,No alcanza nivel mínimo de sostenibilidad,0,41
+18,5,Nivel mínimo de sostenibilidad,42,93
+19,5,Nivel medio de sostenibilidad,94,112
+20,5,Nivel alto de sostenibilidad,113,126

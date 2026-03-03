@@ -19,7 +19,7 @@ func NewNivelRespuestaRepository(db *sql.DB) repository.NivelRespuestaRepository
 
 func (r *NivelRespuestaRepository) FindByIndicador(ctx context.Context, idIndicador int) ([]*domain.NivelRespuesta, error) {
 	query := `
-		SELECT id_nivel_respuesta, id_indicador, nombre, descripcion, puntos, COALESCE(posicion, 0) as posicion
+		SELECT id_nivel_respuesta, id_indicador, nombre, COALESCE(descripcion, '') as descripcion, puntos, COALESCE(posicion, 0) as posicion
 		FROM niveles_respuesta
 		WHERE id_indicador = $1
 		ORDER BY posicion ASC
@@ -45,7 +45,7 @@ func (r *NivelRespuestaRepository) FindByIndicador(ctx context.Context, idIndica
 
 func (r *NivelRespuestaRepository) FindByID(ctx context.Context, id int) (*domain.NivelRespuesta, error) {
 	query := `
-		SELECT id_nivel_respuesta, id_indicador, nombre, descripcion, puntos, COALESCE(posicion, 0) as posicion
+		SELECT id_nivel_respuesta, id_indicador, nombre, COALESCE(descripcion, '') as descripcion, puntos, COALESCE(posicion, 0) as posicion
 		FROM niveles_respuesta
 		WHERE id_nivel_respuesta = $1
 	`

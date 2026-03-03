@@ -1,0 +1,152 @@
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.autoevaluaciones (
+  id_autoevaluacion integer GENERATED ALWAYS AS IDENTITY NOT NULL,
+  fecha_inicio timestamp with time zone NOT NULL DEFAULT now(),
+  fecha_fin timestamp with time zone,
+  estado USER-DEFINED NOT NULL DEFAULT 'PENDIENTE'::estado_autoevaluacion,
+  id_bodega integer NOT NULL,
+  id_segmento integer,
+  puntaje_final integer,
+  id_nivel_sostenibilidad integer,
+  estado_evidencia USER-DEFINED,
+  CONSTRAINT autoevaluaciones_pkey PRIMARY KEY (id_autoevaluacion),
+  CONSTRAINT autoevaluaciones_bodega_fk FOREIGN KEY (id_bodega) REFERENCES public.bodegas(id_bodega),
+  CONSTRAINT autoevaluaciones_segmento_fk FOREIGN KEY (id_segmento) REFERENCES public.segmentos(id_segmento),
+  CONSTRAINT autoevaluaciones_id_nivel_sostenibilidad_fk FOREIGN KEY (id_nivel_sostenibilidad) REFERENCES public.niveles_sostenibilidad(id_nivel_sostenibilidad)
+);
+CREATE TABLE public.bodegas (
+  id_bodega integer GENERATED ALWAYS AS IDENTITY NOT NULL,
+  razon_social text NOT NULL,
+  nombre_fantasia text NOT NULL,
+  cuit character NOT NULL CHECK (cuit ~ '^[0-9]{11}$'::text),
+  inv_bod character,
+  inv_vin character,
+  calle text NOT NULL,
+  numeracion text NOT NULL DEFAULT 'S/N'::text,
+  id_localidad integer NOT NULL,
+  telefono text NOT NULL CHECK (telefono ~ '^[0-9]+$'::text),
+  email_institucional text NOT NULL CHECK (email_institucional ~~ '%@%'::text),
+  fecha_registro timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT bodegas_pkey PRIMARY KEY (id_bodega),
+  CONSTRAINT bodegas_localidad_fkey FOREIGN KEY (id_localidad) REFERENCES public.localidades(id_localidad)
+);
+CREATE TABLE public.capitulos (
+  id_capitulo integer GENERATED ALWAYS AS IDENTITY NOT NULL,
+  nombre text NOT NULL,
+  descripcion text NOT NULL,
+  orden integer NOT NULL,
+  CONSTRAINT capitulos_pkey PRIMARY KEY (id_capitulo)
+);
+CREATE TABLE public.cuentas (
+  id_cuenta integer GENERATED ALWAYS AS IDENTITY NOT NULL,
+  tipo USER-DEFINED NOT NULL,
+  id_bodega integer UNIQUE,
+  email_login character varying NOT NULL UNIQUE,
+  password_hash text NOT NULL,
+  fecha_registro timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT cuentas_pkey PRIMARY KEY (id_cuenta),
+  CONSTRAINT cuentas_bodega_fk FOREIGN KEY (id_bodega) REFERENCES public.bodegas(id_bodega)
+);
+CREATE TABLE public.departamentos (
+  id_departamento integer GENERATED ALWAYS AS IDENTITY NOT NULL,
+  nombre text NOT NULL,
+  id_provincia integer NOT NULL,
+  CONSTRAINT departamentos_pkey PRIMARY KEY (id_departamento),
+  CONSTRAINT departamentos_id_provincia_fkey FOREIGN KEY (id_provincia) REFERENCES public.provincias(id_provincia)
+);
+CREATE TABLE public.evidencias (
+  id_evidencia integer GENERATED ALWAYS AS IDENTITY NOT NULL,
+  id_respuesta integer NOT NULL,
+  nombre text NOT NULL,
+  ubicacion text NOT NULL,
+  CONSTRAINT evidencias_pkey PRIMARY KEY (id_evidencia),
+  CONSTRAINT evidencias_respuesta_fk FOREIGN KEY (id_respuesta) REFERENCES public.respuestas(id_respuesta)
+);
+CREATE TABLE public.indicadores (
+  id_indicador integer GENERATED ALWAYS AS IDENTITY NOT NULL,
+  id_capitulo integer NOT NULL,
+  nombre text NOT NULL,
+  descripcion text NOT NULL,
+  orden integer NOT NULL,
+  CONSTRAINT indicadores_pkey PRIMARY KEY (id_indicador),
+  CONSTRAINT indicadores_capitulo_fk FOREIGN KEY (id_capitulo) REFERENCES public.capitulos(id_capitulo)
+);
+CREATE TABLE public.localidades (
+  id_localidad integer GENERATED ALWAYS AS IDENTITY NOT NULL,
+  nombre text NOT NULL,
+  id_departamento integer NOT NULL,
+  CONSTRAINT localidades_pkey PRIMARY KEY (id_localidad),
+  CONSTRAINT localidades_id_departamento_fkey FOREIGN KEY (id_departamento) REFERENCES public.departamentos(id_departamento)
+);
+CREATE TABLE public.niveles_respuesta (
+  id_nivel_respuesta integer GENERATED ALWAYS AS IDENTITY NOT NULL,
+  id_indicador integer NOT NULL,
+  nombre text NOT NULL,
+  descripcion text NOT NULL,
+  puntos integer NOT NULL,
+  posicion integer,
+  CONSTRAINT niveles_respuesta_pkey PRIMARY KEY (id_nivel_respuesta),
+  CONSTRAINT niveles_respuesta_indicador_fk FOREIGN KEY (id_indicador) REFERENCES public.indicadores(id_indicador)
+);
+CREATE TABLE public.niveles_sostenibilidad (
+  id_nivel_sostenibilidad integer GENERATED ALWAYS AS IDENTITY NOT NULL,
+  id_segmento integer NOT NULL,
+  nombre text NOT NULL,
+  min_puntaje integer NOT NULL,
+  max_puntaje integer NOT NULL,
+  CONSTRAINT niveles_sostenibilidad_pkey PRIMARY KEY (id_nivel_sostenibilidad),
+  CONSTRAINT niveles_sostenibilidad_segmento_fk FOREIGN KEY (id_segmento) REFERENCES public.segmentos(id_segmento)
+);
+CREATE TABLE public.provincias (
+  id_provincia integer GENERATED ALWAYS AS IDENTITY NOT NULL,
+  nombre text NOT NULL UNIQUE,
+  CONSTRAINT provincias_pkey PRIMARY KEY (id_provincia)
+);
+CREATE TABLE public.responsables (
+  id_responsable integer GENERATED ALWAYS AS IDENTITY NOT NULL,
+  id_cuenta integer NOT NULL,
+  nombre text NOT NULL,
+  apellido text NOT NULL,
+  cargo text NOT NULL,
+  dni character varying NOT NULL CHECK (dni IS NULL OR dni::text ~ '^[0-9]{7,8}$'::text),
+  activo boolean NOT NULL DEFAULT true,
+  fecha_registro timestamp with time zone NOT NULL DEFAULT now(),
+  fecha_baja timestamp with time zone,
+  CONSTRAINT responsables_pkey PRIMARY KEY (id_responsable),
+  CONSTRAINT responsables_cuenta_fk FOREIGN KEY (id_cuenta) REFERENCES public.cuentas(id_cuenta)
+);
+CREATE TABLE public.respuestas (
+  id_respuesta integer GENERATED ALWAYS AS IDENTITY NOT NULL,
+  id_nivel_respuesta integer NOT NULL,
+  id_indicador integer NOT NULL,
+  id_autoevaluacion integer NOT NULL,
+  CONSTRAINT respuestas_pkey PRIMARY KEY (id_respuesta),
+  CONSTRAINT respuestas_nivel_respuesta_fk FOREIGN KEY (id_nivel_respuesta) REFERENCES public.niveles_respuesta(id_nivel_respuesta),
+  CONSTRAINT respuestas_indicador_fk FOREIGN KEY (id_indicador) REFERENCES public.indicadores(id_indicador),
+  CONSTRAINT respuestas_autoevaluacion_fk FOREIGN KEY (id_autoevaluacion) REFERENCES public.autoevaluaciones(id_autoevaluacion)
+);
+CREATE TABLE public.restaurar_contrasenas (
+  id integer NOT NULL DEFAULT nextval('password_reset_tokens_id_seq'::regclass),
+  user_id integer NOT NULL,
+  token character varying NOT NULL UNIQUE,
+  expires_at timestamp without time zone NOT NULL,
+  used boolean DEFAULT false,
+  created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT restaurar_contrasenas_pkey PRIMARY KEY (id)
+);
+CREATE TABLE public.segmento_indicador (
+  id_segmento integer NOT NULL,
+  id_indicador integer NOT NULL,
+  CONSTRAINT segmento_indicador_pkey PRIMARY KEY (id_segmento, id_indicador),
+  CONSTRAINT segmento_indicador_segmento_fk FOREIGN KEY (id_segmento) REFERENCES public.segmentos(id_segmento),
+  CONSTRAINT segmento_indicador_indicador_fk FOREIGN KEY (id_indicador) REFERENCES public.indicadores(id_indicador)
+);
+CREATE TABLE public.segmentos (
+  id_segmento integer GENERATED ALWAYS AS IDENTITY NOT NULL,
+  nombre text NOT NULL,
+  min_turistas integer NOT NULL,
+  max_turistas integer,
+  CONSTRAINT segmentos_pkey PRIMARY KEY (id_segmento)
+);
