@@ -12,4 +12,5 @@ var (
 	ErrValidation                 = errors.New("error de validación")
 	ErrAutoevaluacionesPendientes = errors.New("no se puede dar de baja: existen autoevaluaciones pendientes")
 	ErrResponsableYaDadoDeBaja    = errors.New("el responsable ya está dado de baja")
+	ErrSinResponsable             = errors.New("no hay un responsable activo asignado a esta bodega")
 )

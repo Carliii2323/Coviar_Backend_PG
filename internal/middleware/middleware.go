@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"coviar_backend/pkg/jwt"
@@ -32,10 +33,17 @@ func Logger(next http.Handler) http.Handler {
 
 func CORS(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Permitir origen específico para desarrollo
 		origin := r.Header.Get("Origin")
-		if origin == "http://localhost:3000" || origin == "http://localhost:8080" {
-			w.Header().Set("Access-Control-Allow-Origin", origin)
+		frontendURL := os.Getenv("FRONTEND_URL")
+		allowed := []string{"http://localhost:3000", "http://localhost:8080"}
+		if frontendURL != "" {
+			allowed = append(allowed, frontendURL)
+		}
+		for _, o := range allowed {
+			if origin == o {
+				w.Header().Set("Access-Control-Allow-Origin", origin)
+				break
+			}
 		}
 
 		// IMPORTANTE: Requerido para cookies

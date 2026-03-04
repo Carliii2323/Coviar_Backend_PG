@@ -60,6 +60,15 @@ func NewAutoevaluacionService(
 
 // CreateAutoevaluacion crea una nueva autoevaluación para una bodega o retorna la pendiente
 func (s *AutoevaluacionService) CreateAutoevaluacion(ctx context.Context, idBodega int) (*domain.AutoevaluacionPendienteResponse, error) {
+	// Verificar que haya un responsable activo asignado a la bodega
+	responsable, err := s.responsableRepo.FindActivoByBodega(ctx, idBodega)
+	if err != nil {
+		return nil, fmt.Errorf("error checking responsable: %w", err)
+	}
+	if responsable == nil {
+		return nil, domain.ErrSinResponsable
+	}
+
 	// Verificar si ya existe una autoevaluación pendiente para esta bodega
 	autoPendiente, err := s.autoevaluacionRepo.FindPendienteByBodega(ctx, idBodega)
 	if err != nil {
