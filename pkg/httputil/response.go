@@ -66,6 +66,8 @@ func HandleServiceError(w http.ResponseWriter, err error) {
 		RespondError(w, http.StatusConflict, err.Error())
 	case errors.Is(err, domain.ErrResponsableYaDadoDeBaja):
 		RespondError(w, http.StatusConflict, err.Error())
+	case errors.Is(err, domain.ErrSinResponsable):
+		RespondError(w, http.StatusUnprocessableEntity, err.Error())
 	case errors.Is(err, domain.ErrValidation):
 		RespondError(w, http.StatusBadRequest, "error de validación")
 	case errors.Is(err, domain.ErrInvalidCredentials):
