@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 
@@ -108,7 +109,12 @@ func (h *ResponsableHandler) DarDeBaja(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.service.DarDeBaja(r.Context(), id); err != nil {
+	var body struct {
+		CancelarPendientes bool `json:"cancelar_pendientes"`
+	}
+	json.NewDecoder(r.Body).Decode(&body) //nolint:errcheck
+
+	if err := h.service.DarDeBaja(r.Context(), id, body.CancelarPendientes); err != nil {
 		httputil.HandleServiceError(w, err)
 		return
 	}

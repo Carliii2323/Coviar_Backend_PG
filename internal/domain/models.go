@@ -264,7 +264,8 @@ type Autoevaluacion struct {
 	IDSegmento            *int                 `json:"id_segmento,omitempty"`
 	PuntajeFinal          *int                 `json:"puntaje_final,omitempty"`
 	IDNivelSostenibilidad *int                 `json:"id_nivel_sostenibilidad,omitempty"`
-	EstadoEvidencia       *EstadoEvidencia     `json:"estado_evidencia,omitempty"` // ← NUEVA LÍNEA
+	EstadoEvidencia       *EstadoEvidencia     `json:"estado_evidencia,omitempty"`
+	IDResponsable         *int                 `json:"id_responsable,omitempty"`
 }
 
 type Respuesta struct {

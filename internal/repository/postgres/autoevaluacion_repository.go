@@ -20,13 +20,13 @@ func NewAutoevaluacionRepository(db *sql.DB) repository.AutoevaluacionRepository
 
 func (r *AutoevaluacionRepository) Create(ctx context.Context, tx repository.Transaction, auto *domain.Autoevaluacion) (int, error) {
 	query := `
-		INSERT INTO autoevaluaciones (fecha_inicio, estado, id_bodega)
-		VALUES (NOW(), $1, $2)
+		INSERT INTO autoevaluaciones (fecha_inicio, estado, id_bodega, id_responsable)
+		VALUES (NOW(), $1, $2, $3)
 		RETURNING id_autoevaluacion
 	`
 
 	var id int
-	err := r.db.QueryRowContext(ctx, query, domain.EstadoPendiente, auto.IDBodega).Scan(&id)
+	err := r.db.QueryRowContext(ctx, query, domain.EstadoPendiente, auto.IDBodega, auto.IDResponsable).Scan(&id)
 	if err != nil {
 		return 0, fmt.Errorf("error creating autoevaluacion: %w", err)
 	}
@@ -59,21 +59,26 @@ func (r *AutoevaluacionRepository) Create(ctx context.Context, tx repository.Tra
 
 func (r *AutoevaluacionRepository) FindByID(ctx context.Context, id int) (*domain.Autoevaluacion, error) {
 	query := `
-		SELECT id_autoevaluacion, fecha_inicio, fecha_fin, estado, id_bodega, id_segmento, 
-		       puntaje_final, id_nivel_sostenibilidad                                      
+		SELECT id_autoevaluacion, fecha_inicio, fecha_fin, estado, id_bodega, id_segmento,
+		       puntaje_final, id_nivel_sostenibilidad, id_responsable
 		FROM autoevaluaciones WHERE id_autoevaluacion = $1
 	`
 
 	auto := &domain.Autoevaluacion{}
+	var idResp sql.NullInt64
 	err := r.db.QueryRowContext(ctx, query, id).Scan(
 		&auto.ID, &auto.FechaInicio, &auto.FechaFin, &auto.Estado, &auto.IDBodega, &auto.IDSegmento,
-		&auto.PuntajeFinal, &auto.IDNivelSostenibilidad,
+		&auto.PuntajeFinal, &auto.IDNivelSostenibilidad, &idResp,
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, domain.ErrNotFound
 		}
 		return nil, fmt.Errorf("error finding autoevaluacion: %w", err)
+	}
+	if idResp.Valid {
+		v := int(idResp.Int64)
+		auto.IDResponsable = &v
 	}
 
 	return auto, nil
@@ -162,21 +167,26 @@ func (r *AutoevaluacionRepository) CompleteWithScore(ctx context.Context, id int
 func (r *AutoevaluacionRepository) FindPendienteByBodega(ctx context.Context, idBodega int) (*domain.Autoevaluacion, error) {
 	query := `
 		SELECT id_autoevaluacion, fecha_inicio, fecha_fin, estado, id_bodega, id_segmento,
-		       puntaje_final, id_nivel_sostenibilidad                                      
-		FROM autoevaluaciones 
+		       puntaje_final, id_nivel_sostenibilidad, id_responsable
+		FROM autoevaluaciones
 		WHERE id_bodega = $1 AND estado = $2
 	`
 
 	auto := &domain.Autoevaluacion{}
+	var idResp sql.NullInt64
 	err := r.db.QueryRowContext(ctx, query, idBodega, domain.EstadoPendiente).Scan(
 		&auto.ID, &auto.FechaInicio, &auto.FechaFin, &auto.Estado, &auto.IDBodega, &auto.IDSegmento,
-		&auto.PuntajeFinal, &auto.IDNivelSostenibilidad,
+		&auto.PuntajeFinal, &auto.IDNivelSostenibilidad, &idResp,
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, nil // No hay autoevaluación pendiente
+			return nil, nil
 		}
 		return nil, fmt.Errorf("error finding pending autoevaluacion: %w", err)
+	}
+	if idResp.Valid {
+		v := int(idResp.Int64)
+		auto.IDResponsable = &v
 	}
 
 	return auto, nil
@@ -219,7 +229,7 @@ func (r *AutoevaluacionRepository) UpdateEvidenciaStatus(ctx context.Context, id
 func (r *AutoevaluacionRepository) FindCompletadasByBodega(ctx context.Context, idBodega int) ([]*domain.Autoevaluacion, error) {
 	query := `
 		SELECT id_autoevaluacion, id_bodega, id_segmento, estado, puntaje_final,
-		       id_nivel_sostenibilidad, fecha_inicio, fecha_fin
+		       id_nivel_sostenibilidad, fecha_inicio, fecha_fin, id_responsable
 		FROM autoevaluaciones
 		WHERE id_bodega = $1 AND estado = 'COMPLETADA'
 		ORDER BY fecha_inicio DESC
@@ -234,13 +244,18 @@ func (r *AutoevaluacionRepository) FindCompletadasByBodega(ctx context.Context, 
 	var autoevaluaciones []*domain.Autoevaluacion
 	for rows.Next() {
 		auto := &domain.Autoevaluacion{}
+		var idResp sql.NullInt64
 		err := rows.Scan(
 			&auto.ID, &auto.IDBodega, &auto.IDSegmento, &auto.Estado,
 			&auto.PuntajeFinal, &auto.IDNivelSostenibilidad,
-			&auto.FechaInicio, &auto.FechaFin,
+			&auto.FechaInicio, &auto.FechaFin, &idResp,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("error scanning autoevaluacion completada: %w", err)
+		}
+		if idResp.Valid {
+			v := int(idResp.Int64)
+			auto.IDResponsable = &v
 		}
 		autoevaluaciones = append(autoevaluaciones, auto)
 	}
@@ -251,7 +266,7 @@ func (r *AutoevaluacionRepository) FindCompletadasByBodega(ctx context.Context, 
 func (r *AutoevaluacionRepository) FindLastCompletadaByBodega(ctx context.Context, idBodega int) (*domain.Autoevaluacion, error) {
 	query := `
 		SELECT id_autoevaluacion, id_bodega, id_segmento, estado, puntaje_final,
-		       id_nivel_sostenibilidad, fecha_inicio, fecha_fin
+		       id_nivel_sostenibilidad, fecha_inicio, fecha_fin, id_responsable
 		FROM autoevaluaciones
 		WHERE id_bodega = $1 AND estado = 'COMPLETADA'
 		ORDER BY fecha_fin DESC
@@ -259,16 +274,21 @@ func (r *AutoevaluacionRepository) FindLastCompletadaByBodega(ctx context.Contex
 	`
 
 	auto := &domain.Autoevaluacion{}
+	var idResp sql.NullInt64
 	err := r.db.QueryRowContext(ctx, query, idBodega).Scan(
 		&auto.ID, &auto.IDBodega, &auto.IDSegmento, &auto.Estado,
 		&auto.PuntajeFinal, &auto.IDNivelSostenibilidad,
-		&auto.FechaInicio, &auto.FechaFin,
+		&auto.FechaInicio, &auto.FechaFin, &idResp,
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
 		return nil, fmt.Errorf("error finding last completada: %w", err)
+	}
+	if idResp.Valid {
+		v := int(idResp.Int64)
+		auto.IDResponsable = &v
 	}
 
 	return auto, nil

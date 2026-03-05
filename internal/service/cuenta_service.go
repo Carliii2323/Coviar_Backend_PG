@@ -59,7 +59,7 @@ func (s *CuentaService) Login(ctx context.Context, req *domain.CuentaRequest) (*
 		ID:            cuenta.ID,
 		Tipo:          cuenta.Tipo,
 		EmailLogin:    cuenta.EmailLogin,
-		FechaRegistro: cuenta.FechaRegistro.Format("2006-01-02T15:04:05Z"),
+		FechaRegistro: cuenta.FechaRegistro.UTC().Format("2006-01-02T15:04:05Z"),
 	}
 
 	if cuenta.IDBodega != nil {
@@ -82,7 +82,7 @@ func (s *CuentaService) GetByIDWithBodega(ctx context.Context, id int) (*CuentaC
 		ID:            cuenta.ID,
 		Tipo:          cuenta.Tipo,
 		EmailLogin:    cuenta.EmailLogin,
-		FechaRegistro: cuenta.FechaRegistro.Format("2006-01-02T15:04:05Z"),
+		FechaRegistro: cuenta.FechaRegistro.UTC().Format("2006-01-02T15:04:05Z"),
 	}
 
 	if cuenta.IDBodega != nil {

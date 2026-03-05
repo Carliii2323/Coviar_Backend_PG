@@ -224,11 +224,11 @@ func (r *AdminRepository) GetAllEvaluaciones(ctx context.Context, estado string,
 		}
 
 		if fechaInicio.Valid {
-			item.FechaInicio = fechaInicio.Time.Format("2006-01-02T15:04:05Z")
+			item.FechaInicio = fechaInicio.Time.UTC().Format("2006-01-02T15:04:05Z")
 		}
 
 		if fechaFin.Valid {
-			fin := fechaFin.Time.Format("2006-01-02T15:04:05Z")
+			fin := fechaFin.Time.UTC().Format("2006-01-02T15:04:05Z")
 			item.FechaFin = &fin
 		}
 

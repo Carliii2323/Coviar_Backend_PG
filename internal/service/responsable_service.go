@@ -111,7 +111,7 @@ func (s *ResponsableService) Update(ctx context.Context, id int, dto *domain.Res
 	return s.responsableRepo.Update(ctx, nil, responsable)
 }
 
-func (s *ResponsableService) DarDeBaja(ctx context.Context, id int) error {
+func (s *ResponsableService) DarDeBaja(ctx context.Context, id int, forzar bool) error {
 	responsable, err := s.responsableRepo.FindByID(ctx, id)
 	if err != nil {
 		return err
@@ -132,7 +132,19 @@ func (s *ResponsableService) DarDeBaja(ctx context.Context, id int) error {
 			return err
 		}
 		if hasPending {
-			return domain.ErrAutoevaluacionesPendientes
+			if !forzar {
+				return domain.ErrAutoevaluacionesPendientes
+			}
+			// Cancelar la autoevaluación pendiente antes de dar de baja
+			pending, err := s.autoevaluacionRepo.FindPendienteByBodega(ctx, *cuenta.IDBodega)
+			if err != nil {
+				return err
+			}
+			if pending != nil {
+				if err := s.autoevaluacionRepo.Cancel(ctx, pending.ID); err != nil {
+					return err
+				}
+			}
 		}
 	}
 
