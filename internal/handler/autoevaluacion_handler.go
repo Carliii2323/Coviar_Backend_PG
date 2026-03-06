@@ -19,23 +19,6 @@ func NewAutoevaluacionHandler(service *service.AutoevaluacionService) *Autoevalu
 }
 
 // CreateAutoevaluacion POST /api/autoevaluaciones
-/*func (h *AutoevaluacionHandler) CreateAutoevaluacion(w http.ResponseWriter, r *http.Request) {
-	var req domain.CreateAutoevaluacionRequest
-	if err := httputil.DecodeJSON(r, &req); err != nil {
-		httputil.RespondError(w, http.StatusBadRequest, "JSON inválido")
-		return
-	}
-
-	auto, err := h.service.CreateAutoevaluacion(r.Context(), req.IDBodega)
-	if err != nil {
-		httputil.HandleServiceError(w, err)
-		return
-	}
-
-	httputil.RespondJSON(w, http.StatusCreated, auto)
-}*/
-
-// CreateAutoevaluacion POST /api/autoevaluaciones
 func (h *AutoevaluacionHandler) CreateAutoevaluacion(w http.ResponseWriter, r *http.Request) {
 	var req domain.CreateAutoevaluacionRequest
 	if err := httputil.DecodeJSON(r, &req); err != nil {

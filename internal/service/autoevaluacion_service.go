@@ -43,21 +43,6 @@ func NewAutoevaluacionService(
 	}
 }
 
-// CreateAutoevaluacion crea una nueva autoevaluación para una bodega
-/*func (s *AutoevaluacionService) CreateAutoevaluacion(ctx context.Context, idBodega int) (*domain.Autoevaluacion, error) {
-	auto := &domain.Autoevaluacion{
-		IDBodega: idBodega,
-	}
-
-	id, err := s.autoevaluacionRepo.Create(ctx, nil, auto)
-	if err != nil {
-		return nil, fmt.Errorf("error creating autoevaluacion: %w", err)
-	}
-
-	auto.ID = id
-	return auto, nil
-}*/
-
 // CreateAutoevaluacion crea una nueva autoevaluación para una bodega o retorna la pendiente
 func (s *AutoevaluacionService) CreateAutoevaluacion(ctx context.Context, idBodega int) (*domain.AutoevaluacionPendienteResponse, error) {
 	// Verificar que haya un responsable activo asignado a la bodega
@@ -288,38 +273,6 @@ func (s *AutoevaluacionService) GuardarRespuestas(ctx context.Context, idAutoeva
 
 	return resultado, nil
 }
-
-// CompletarAutoevaluacion marca la autoevaluación como completada
-/*func (s *AutoevaluacionService) CompletarAutoevaluacion(ctx context.Context, idAutoevaluacion int) error {
-	// Verificar que la autoevaluación existe
-	auto, err := s.autoevaluacionRepo.FindByID(ctx, idAutoevaluacion)
-	if err != nil {
-		return fmt.Errorf("error finding autoevaluacion: %w", err)
-	}
-
-	if auto == nil {
-		return domain.ErrNotFound
-	}
-
-	// Obtener respuestas para validar que todas las preguntas fueron respondidas
-	respuestas, err := s.respuestaRepo.FindByAutoevaluacion(ctx, idAutoevaluacion)
-	if err != nil {
-		return fmt.Errorf("error getting respuestas: %w", err)
-	}
-
-	// Validación básica: debe haber al menos una respuesta
-	if len(respuestas) == 0 {
-		return fmt.Errorf("autoevaluacion must have at least one respuesta")
-	}
-
-	// Marcar como completada
-	err = s.autoevaluacionRepo.Complete(ctx, idAutoevaluacion)
-	if err != nil {
-		return fmt.Errorf("error completing autoevaluacion: %w", err)
-	}
-
-	return nil
-}*/
 
 // CompletarAutoevaluacion marca la autoevaluación como completada
 func (s *AutoevaluacionService) CompletarAutoevaluacion(ctx context.Context, idAutoevaluacion int) error {

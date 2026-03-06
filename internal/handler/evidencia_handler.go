@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"coviar_backend/internal/domain"
+	"coviar_backend/internal/middleware"
 	"coviar_backend/internal/service"
 	"coviar_backend/pkg/httputil"
 	"coviar_backend/pkg/router"
@@ -19,6 +20,21 @@ func NewEvidenciaHandler(service *service.EvidenciaService) *EvidenciaHandler {
 	return &EvidenciaHandler{
 		service: service,
 	}
+}
+
+// verificarOwnership verifica que la autoevaluación pertenezca al usuario autenticado.
+// Los administradores tienen acceso irrestricto. Retorna false y escribe 403 si no tiene acceso.
+func (h *EvidenciaHandler) verificarOwnership(w http.ResponseWriter, r *http.Request, idAutoevaluacion int) bool {
+	tipo, _ := r.Context().Value(middleware.UserTipoKey).(string)
+	if tipo == string(domain.TipoCuentaAdministradorApp) {
+		return true
+	}
+	bodegaID, _ := r.Context().Value(middleware.BodegaIDKey).(int)
+	if err := h.service.VerificarPropietario(r.Context(), idAutoevaluacion, bodegaID); err != nil {
+		httputil.RespondError(w, http.StatusForbidden, "no tenés permiso para acceder a esta autoevaluación")
+		return false
+	}
+	return true
 }
 
 // AgregarEvidencia POST /api/autoevaluaciones/{id_autoevaluacion}/respuestas/{id_respuesta}/evidencias
@@ -35,6 +51,10 @@ func (h *EvidenciaHandler) AgregarEvidencia(w http.ResponseWriter, r *http.Reque
 	idRespuesta, err := strconv.Atoi(idRespuestaStr)
 	if err != nil {
 		httputil.RespondError(w, http.StatusBadRequest, "ID respuesta inválido")
+		return
+	}
+
+	if !h.verificarOwnership(w, r, idAutoevaluacion) {
 		return
 	}
 
@@ -70,11 +90,22 @@ func (h *EvidenciaHandler) AgregarEvidencia(w http.ResponseWriter, r *http.Reque
 
 // ObtenerEvidencia GET /api/autoevaluaciones/{id_autoevaluacion}/respuestas/{id_respuesta}/evidencia
 func (h *EvidenciaHandler) ObtenerEvidencia(w http.ResponseWriter, r *http.Request) {
+	idAutoevaluacionStr := router.GetParam(r, "id_autoevaluacion")
 	idRespuestaStr := router.GetParam(r, "id_respuesta")
+
+	idAutoevaluacion, err := strconv.Atoi(idAutoevaluacionStr)
+	if err != nil {
+		httputil.RespondError(w, http.StatusBadRequest, "ID autoevaluación inválido")
+		return
+	}
 
 	idRespuesta, err := strconv.Atoi(idRespuestaStr)
 	if err != nil {
 		httputil.RespondError(w, http.StatusBadRequest, "ID respuesta inválido")
+		return
+	}
+
+	if !h.verificarOwnership(w, r, idAutoevaluacion) {
 		return
 	}
 
@@ -107,6 +138,10 @@ func (h *EvidenciaHandler) ObtenerEvidenciasPorAutoevaluacion(w http.ResponseWri
 		return
 	}
 
+	if !h.verificarOwnership(w, r, idAutoevaluacion) {
+		return
+	}
+
 	evidencias, err := h.service.ObtenerEvidenciasPorAutoevaluacion(r.Context(), idAutoevaluacion)
 	if err != nil {
 		httputil.HandleServiceError(w, err)
@@ -125,11 +160,22 @@ func (h *EvidenciaHandler) ObtenerEvidenciasPorAutoevaluacion(w http.ResponseWri
 
 // DescargarEvidencia GET /api/autoevaluaciones/{id_autoevaluacion}/respuestas/{id_respuesta}/evidencia/descargar
 func (h *EvidenciaHandler) DescargarEvidencia(w http.ResponseWriter, r *http.Request) {
+	idAutoevaluacionStr := router.GetParam(r, "id_autoevaluacion")
 	idRespuestaStr := router.GetParam(r, "id_respuesta")
+
+	idAutoevaluacion, err := strconv.Atoi(idAutoevaluacionStr)
+	if err != nil {
+		httputil.RespondError(w, http.StatusBadRequest, "ID autoevaluación inválido")
+		return
+	}
 
 	idRespuesta, err := strconv.Atoi(idRespuestaStr)
 	if err != nil {
 		httputil.RespondError(w, http.StatusBadRequest, "ID respuesta inválido")
+		return
+	}
+
+	if !h.verificarOwnership(w, r, idAutoevaluacion) {
 		return
 	}
 
@@ -171,6 +217,10 @@ func (h *EvidenciaHandler) DescargarTodasEvidencias(w http.ResponseWriter, r *ht
 		return
 	}
 
+	if !h.verificarOwnership(w, r, idAutoevaluacion) {
+		return
+	}
+
 	zipData, err := h.service.DescargarTodasEvidenciasZip(r.Context(), idAutoevaluacion)
 	if err != nil {
 		httputil.HandleServiceError(w, err)
@@ -205,6 +255,10 @@ func (h *EvidenciaHandler) EliminarEvidencia(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	if !h.verificarOwnership(w, r, idAutoevaluacion) {
+		return
+	}
+
 	if err := h.service.EliminarEvidencia(r.Context(), idAutoevaluacion, idRespuesta); err != nil {
 		httputil.HandleServiceError(w, err)
 		return
@@ -229,6 +283,10 @@ func (h *EvidenciaHandler) CambiarEvidencia(w http.ResponseWriter, r *http.Reque
 	idRespuesta, err := strconv.Atoi(idRespuestaStr)
 	if err != nil {
 		httputil.RespondError(w, http.StatusBadRequest, "ID respuesta inválido")
+		return
+	}
+
+	if !h.verificarOwnership(w, r, idAutoevaluacion) {
 		return
 	}
 

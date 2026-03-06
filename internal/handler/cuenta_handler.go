@@ -7,26 +7,43 @@ import (
 	"time"
 
 	"coviar_backend/internal/domain"
+	"coviar_backend/internal/middleware"
 	"coviar_backend/internal/service"
+	"coviar_backend/pkg/audit"
 	"coviar_backend/pkg/httputil"
 	"coviar_backend/pkg/jwt"
+	"coviar_backend/pkg/ratelimit"
 	"coviar_backend/pkg/router"
 )
 
 type CuentaHandler struct {
-	service   *service.CuentaService
-	jwtSecret string
+	service      *service.CuentaService
+	jwtSecret    string
+	isProduction bool
+	limiter      *ratelimit.Limiter
+	audit        *audit.Logger
 }
 
-func NewCuentaHandler(service *service.CuentaService, jwtSecret string) *CuentaHandler {
+func NewCuentaHandler(service *service.CuentaService, jwtSecret string, isProduction bool, auditLogger *audit.Logger) *CuentaHandler {
 	return &CuentaHandler{
-		service:   service,
-		jwtSecret: jwtSecret,
+		service:      service,
+		jwtSecret:    jwtSecret,
+		isProduction: isProduction,
+		limiter:      ratelimit.New(),
+		audit:        auditLogger,
 	}
 }
 
 func (h *CuentaHandler) Login(w http.ResponseWriter, r *http.Request) {
 	log.Printf("🔐 Login request recibido")
+
+	ip := ratelimit.GetIP(r)
+	if h.limiter.IsBlocked(ip) {
+		log.Printf("🚫 IP bloqueada por exceso de intentos: %s", ip)
+		httputil.RespondError(w, http.StatusTooManyRequests, "demasiados intentos fallidos, intentá de nuevo en 15 minutos")
+		return
+	}
+
 	var req domain.CuentaRequest
 	if err := httputil.DecodeJSON(r, &req); err != nil {
 		log.Printf("❌ Error decodificando JSON: %v", err)
@@ -34,17 +51,25 @@ func (h *CuentaHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("📧 Intentando login con email: %s", req.EmailLogin)
-	log.Printf("🔑 Password recibido: %d caracteres", len(req.Password))
+	log.Printf("🔐 Intento de login desde IP: %s", ip)
 
 	cuenta, err := h.service.Login(r.Context(), &req)
 	if err != nil {
 		log.Printf("❌ Error en login: %v", err)
+		h.limiter.RecordFailure(ip)
+		h.audit.Log(r.Context(), audit.LoginFallido, nil, ip, "")
 		httputil.HandleServiceError(w, err)
 		return
 	}
 
 	log.Printf("✅ Login exitoso para cuenta ID: %d", cuenta.ID)
+	h.limiter.RecordSuccess(ip)
+	h.audit.Log(r.Context(), audit.LoginExitoso, &cuenta.ID, ip, "")
+
+	bodegaID := 0
+	if cuenta.Bodega != nil {
+		bodegaID = cuenta.Bodega.ID
+	}
 
 	// Generar JWT token (válido por 24 horas)
 	accessToken, err := jwt.GenerateToken(
@@ -53,6 +78,7 @@ func (h *CuentaHandler) Login(w http.ResponseWriter, r *http.Request) {
 		string(cuenta.Tipo),
 		h.jwtSecret,
 		24*time.Hour,
+		bodegaID,
 	)
 	if err != nil {
 		log.Printf("❌ Error generando access token: %v", err)
@@ -66,6 +92,7 @@ func (h *CuentaHandler) Login(w http.ResponseWriter, r *http.Request) {
 		cuenta.EmailLogin,
 		string(cuenta.Tipo),
 		h.jwtSecret,
+		bodegaID,
 	)
 	if err != nil {
 		log.Printf("❌ Error generando refresh token: %v", err)
@@ -73,25 +100,25 @@ func (h *CuentaHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Establecer cookie de access token (HttpOnly, Secure en producción)
+	// Establecer cookie de access token
 	http.SetCookie(w, &http.Cookie{
 		Name:     "auth_token",
 		Value:    accessToken,
 		Path:     "/",
 		MaxAge:   24 * 60 * 60, // 24 horas en segundos
 		HttpOnly: true,
-		Secure:   false, // Cambiar a true en producción con HTTPS
+		Secure:   h.isProduction,
 		SameSite: http.SameSiteLaxMode,
 	})
 
-	// Establecer cookie de refresh token (HttpOnly, Secure en producción)
+	// Establecer cookie de refresh token
 	http.SetCookie(w, &http.Cookie{
 		Name:     "refresh_token",
 		Value:    refreshToken,
 		Path:     "/",
 		MaxAge:   7 * 24 * 60 * 60, // 7 días en segundos
 		HttpOnly: true,
-		Secure:   false, // Cambiar a true en producción con HTTPS
+		Secure:   h.isProduction,
 		SameSite: http.SameSiteLaxMode,
 	})
 
@@ -138,6 +165,10 @@ func (h *CuentaHandler) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 		httputil.HandleServiceError(w, err)
 		return
 	}
+
+	ip := ratelimit.GetIP(r)
+	idCuenta, _ := r.Context().Value(middleware.UserIDKey).(int)
+	h.audit.Log(r.Context(), audit.CambioPassword, &idCuenta, ip, "")
 
 	httputil.RespondJSON(w, http.StatusOK, map[string]string{"mensaje": "Contraseña actualizada"})
 }

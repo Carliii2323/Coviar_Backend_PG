@@ -3,6 +3,7 @@ package httputil
 import (
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 
 	"coviar_backend/internal/domain"
@@ -39,8 +40,8 @@ func DecodeJSON(r *http.Request, v interface{}) error {
 
 // HandleServiceError maneja errores del servicio de forma centralizada
 func HandleServiceError(w http.ResponseWriter, err error) {
-	// Log del error para debugging
-	println("ERROR:", err.Error())
+	// Log del error para debugging (solo en servidor, nunca al cliente)
+	log.Printf("[ERROR] %v", err)
 
 	// Validación
 	var validationErrs validator.ValidationErrors
@@ -68,6 +69,10 @@ func HandleServiceError(w http.ResponseWriter, err error) {
 		RespondError(w, http.StatusConflict, err.Error())
 	case errors.Is(err, domain.ErrSinResponsable):
 		RespondError(w, http.StatusUnprocessableEntity, err.Error())
+	case errors.Is(err, domain.ErrArchivoInvalido):
+		RespondError(w, http.StatusUnprocessableEntity, err.Error())
+	case errors.Is(err, domain.ErrArchivoDemasiadoGrande):
+		RespondError(w, http.StatusRequestEntityTooLarge, err.Error())
 	case errors.Is(err, domain.ErrValidation):
 		RespondError(w, http.StatusBadRequest, "error de validación")
 	case errors.Is(err, domain.ErrInvalidCredentials):

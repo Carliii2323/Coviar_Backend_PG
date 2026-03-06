@@ -14,19 +14,21 @@ var (
 
 // Claims representa los claims personalizados del JWT
 type Claims struct {
-	UserID    int    `json:"user_id"`
-	Email     string `json:"email"`
+	UserID     int    `json:"user_id"`
+	Email      string `json:"email"`
 	TipoCuenta string `json:"tipo_cuenta"`
+	BodegaID   int    `json:"bodega_id"` // 0 para ADMINISTRADOR_APP
 	jwt.RegisteredClaims
 }
 
 // GenerateToken genera un nuevo JWT token
-func GenerateToken(userID int, email, tipoCuenta, secret string, duration time.Duration) (string, error) {
+func GenerateToken(userID int, email, tipoCuenta, secret string, duration time.Duration, bodegaID int) (string, error) {
 	now := time.Now()
 	claims := Claims{
 		UserID:     userID,
 		Email:      email,
 		TipoCuenta: tipoCuenta,
+		BodegaID:   bodegaID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(now.Add(duration)),
 			IssuedAt:  jwt.NewNumericDate(now),
@@ -65,7 +67,7 @@ func ValidateToken(tokenString, secret string) (*Claims, error) {
 }
 
 // GenerateRefreshToken genera un refresh token con mayor duración
-func GenerateRefreshToken(userID int, email, tipoCuenta, secret string) (string, error) {
+func GenerateRefreshToken(userID int, email, tipoCuenta, secret string, bodegaID int) (string, error) {
 	// Refresh token válido por 7 días
-	return GenerateToken(userID, email, tipoCuenta, secret, 7*24*time.Hour)
+	return GenerateToken(userID, email, tipoCuenta, secret, 7*24*time.Hour, bodegaID)
 }

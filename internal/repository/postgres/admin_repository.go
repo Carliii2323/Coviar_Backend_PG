@@ -146,27 +146,8 @@ func (r *AdminRepository) GetStats(ctx context.Context) (*domain.AdminStatsRespo
 }
 
 func (r *AdminRepository) GetAllEvaluaciones(ctx context.Context, estado string, idBodega int) ([]domain.EvaluacionListItem, error) {
-	// Precalcular responsable activo por bodega en una sola query
-	responsableMap := make(map[int]string)
-	respRows, err := r.db.QueryContext(ctx, `
-		SELECT DISTINCT ON (c.id_bodega) c.id_bodega, r.nombre || ' ' || r.apellido
-		FROM responsables r
-		JOIN cuentas c ON r.id_cuenta = c.id_cuenta
-		WHERE r.activo = true AND c.id_bodega IS NOT NULL
-		ORDER BY c.id_bodega, r.id_responsable
-	`)
-	if err == nil {
-		defer respRows.Close()
-		for respRows.Next() {
-			var idBod int
-			var nombre string
-			if respRows.Scan(&idBod, &nombre) == nil {
-				responsableMap[idBod] = nombre
-			}
-		}
-	}
-
-	// Query principal sin subqueries
+	// JOIN directo con el responsable guardado en cada autoevaluación (id_responsable).
+	// Para evaluaciones antiguas sin responsable registrado, COALESCE retorna 'N/A'.
 	query := `
 		SELECT
 			a.id_autoevaluacion,
@@ -175,9 +156,11 @@ func (r *AdminRepository) GetAllEvaluaciones(ctx context.Context, estado string,
 			b.razon_social,
 			a.estado,
 			a.fecha_inicio,
-			a.fecha_fin
+			a.fecha_fin,
+			COALESCE(r.nombre || ' ' || r.apellido, 'N/A') AS responsable
 		FROM autoevaluaciones a
 		JOIN bodegas b ON a.id_bodega = b.id_bodega
+		LEFT JOIN responsables r ON a.id_responsable = r.id_responsable
 		WHERE 1=1
 	`
 
@@ -218,6 +201,7 @@ func (r *AdminRepository) GetAllEvaluaciones(ctx context.Context, estado string,
 			&item.Estado,
 			&fechaInicio,
 			&fechaFin,
+			&item.Responsable,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("error scanning evaluacion: %w", err)
@@ -230,13 +214,6 @@ func (r *AdminRepository) GetAllEvaluaciones(ctx context.Context, estado string,
 		if fechaFin.Valid {
 			fin := fechaFin.Time.UTC().Format("2006-01-02T15:04:05Z")
 			item.FechaFin = &fin
-		}
-
-		// Responsable desde el mapa precalculado
-		if nombre, ok := responsableMap[item.IDBodega]; ok {
-			item.Responsable = nombre
-		} else {
-			item.Responsable = "N/A"
 		}
 
 		evaluaciones = append(evaluaciones, item)
