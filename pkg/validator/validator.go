@@ -74,12 +74,6 @@ func ValidatePasswordStrength(password string) error {
 	return nil
 }
 
-func ValidatePassword(password string) error {
-	if len(password) < 6 {
-		return fmt.Errorf("la contraseña debe tener al menos 6 caracteres")
-	}
-	return nil
-}
 
 func ValidateInvCode(code *string, fieldName string) error {
 	if code == nil || *code == "" {

@@ -5,10 +5,26 @@ import (
 	"strconv"
 
 	"coviar_backend/internal/domain"
+	"coviar_backend/internal/middleware"
 	"coviar_backend/internal/service"
 	"coviar_backend/pkg/httputil"
 	"coviar_backend/pkg/router"
 )
+
+// esPropietario verifica que el usuario autenticado sea dueño de la bodega,
+// o que sea administrador. Retorna false y escribe 403 si no tiene acceso.
+func esPropietario(w http.ResponseWriter, r *http.Request, idBodega int) bool {
+	tipo, _ := r.Context().Value(middleware.UserTipoKey).(string)
+	if tipo == string(domain.TipoCuentaAdministradorApp) {
+		return true
+	}
+	bodegaID, _ := r.Context().Value(middleware.BodegaIDKey).(int)
+	if bodegaID != idBodega {
+		httputil.RespondError(w, http.StatusForbidden, "no tenés permiso para acceder a esta bodega")
+		return false
+	}
+	return true
+}
 
 type BodegaHandler struct {
 	service              *service.BodegaService
@@ -41,6 +57,10 @@ func (h *BodegaHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !esPropietario(w, r, id) {
+		return
+	}
+
 	bodega, err := h.service.GetByID(r.Context(), id)
 	if err != nil {
 		httputil.HandleServiceError(w, err)
@@ -55,6 +75,10 @@ func (h *BodegaHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		httputil.RespondError(w, http.StatusBadRequest, "ID inválido")
+		return
+	}
+
+	if !esPropietario(w, r, id) {
 		return
 	}
 
@@ -78,6 +102,10 @@ func (h *BodegaHandler) GetResultadosAutoevaluacion(w http.ResponseWriter, r *ht
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		httputil.RespondError(w, http.StatusBadRequest, "ID inválido")
+		return
+	}
+
+	if !esPropietario(w, r, id) {
 		return
 	}
 

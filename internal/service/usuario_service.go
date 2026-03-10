@@ -35,8 +35,8 @@ func (s *UsuarioService) Create(ctx context.Context, dto *domain.UsuarioDTO) (*d
 
 	// Validar password
 	password := strings.TrimSpace(dto.Password)
-	if len(password) < 6 {
-		return nil, fmt.Errorf("la contraseña debe tener al menos 6 caracteres")
+	if len(password) < 8 {
+		return nil, fmt.Errorf("la contraseña debe tener al menos 8 caracteres")
 	}
 
 	// Validar nombre y apellido

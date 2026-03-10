@@ -43,21 +43,6 @@ func NewAutoevaluacionService(
 	}
 }
 
-// CreateAutoevaluacion crea una nueva autoevaluación para una bodega
-/*func (s *AutoevaluacionService) CreateAutoevaluacion(ctx context.Context, idBodega int) (*domain.Autoevaluacion, error) {
-	auto := &domain.Autoevaluacion{
-		IDBodega: idBodega,
-	}
-
-	id, err := s.autoevaluacionRepo.Create(ctx, nil, auto)
-	if err != nil {
-		return nil, fmt.Errorf("error creating autoevaluacion: %w", err)
-	}
-
-	auto.ID = id
-	return auto, nil
-}*/
-
 // CreateAutoevaluacion crea una nueva autoevaluación para una bodega o retorna la pendiente
 func (s *AutoevaluacionService) CreateAutoevaluacion(ctx context.Context, idBodega int) (*domain.AutoevaluacionPendienteResponse, error) {
 	// Verificar que haya un responsable activo asignado a la bodega
@@ -102,7 +87,8 @@ func (s *AutoevaluacionService) CreateAutoevaluacion(ctx context.Context, idBode
 
 	// No existe autoevaluación pendiente, crear una nueva
 	auto := &domain.Autoevaluacion{
-		IDBodega: idBodega,
+		IDBodega:      idBodega,
+		IDResponsable: &responsable.ID,
 	}
 
 	id, err := s.autoevaluacionRepo.Create(ctx, nil, auto)
@@ -289,38 +275,6 @@ func (s *AutoevaluacionService) GuardarRespuestas(ctx context.Context, idAutoeva
 }
 
 // CompletarAutoevaluacion marca la autoevaluación como completada
-/*func (s *AutoevaluacionService) CompletarAutoevaluacion(ctx context.Context, idAutoevaluacion int) error {
-	// Verificar que la autoevaluación existe
-	auto, err := s.autoevaluacionRepo.FindByID(ctx, idAutoevaluacion)
-	if err != nil {
-		return fmt.Errorf("error finding autoevaluacion: %w", err)
-	}
-
-	if auto == nil {
-		return domain.ErrNotFound
-	}
-
-	// Obtener respuestas para validar que todas las preguntas fueron respondidas
-	respuestas, err := s.respuestaRepo.FindByAutoevaluacion(ctx, idAutoevaluacion)
-	if err != nil {
-		return fmt.Errorf("error getting respuestas: %w", err)
-	}
-
-	// Validación básica: debe haber al menos una respuesta
-	if len(respuestas) == 0 {
-		return fmt.Errorf("autoevaluacion must have at least one respuesta")
-	}
-
-	// Marcar como completada
-	err = s.autoevaluacionRepo.Complete(ctx, idAutoevaluacion)
-	if err != nil {
-		return fmt.Errorf("error completing autoevaluacion: %w", err)
-	}
-
-	return nil
-}*/
-
-// CompletarAutoevaluacion marca la autoevaluación como completada
 func (s *AutoevaluacionService) CompletarAutoevaluacion(ctx context.Context, idAutoevaluacion int) error {
 	auto, err := s.autoevaluacionRepo.FindByID(ctx, idAutoevaluacion)
 	if err != nil {
@@ -456,7 +410,7 @@ func (s *AutoevaluacionService) GetHistorialAutoevaluaciones(ctx context.Context
 	for _, auto := range autoevaluaciones {
 		item := domain.HistorialItemResponse{
 			IDAutoevaluacion:      auto.ID,
-			FechaInicio:           auto.FechaInicio.Format("2006-01-02T15:04:05Z"),
+			FechaInicio:           auto.FechaInicio.UTC().Format("2006-01-02T15:04:05Z"),
 			Estado:                strings.ToLower(string(auto.Estado)),
 			IDBodega:              auto.IDBodega,
 			IDSegmento:            auto.IDSegmento,
@@ -465,7 +419,7 @@ func (s *AutoevaluacionService) GetHistorialAutoevaluaciones(ctx context.Context
 		}
 
 		if auto.FechaFin != nil {
-			item.FechaFinalizacion = auto.FechaFin.Format("2006-01-02T15:04:05Z")
+			item.FechaFinalizacion = auto.FechaFin.UTC().Format("2006-01-02T15:04:05Z")
 		}
 
 		// Obtener nombre del segmento
@@ -543,7 +497,7 @@ func (s *AutoevaluacionService) GetResultadosDetallados(ctx context.Context, idA
 	// Construir la info de la autoevaluación
 	autoInfo := domain.HistorialItemResponse{
 		IDAutoevaluacion:      auto.ID,
-		FechaInicio:           auto.FechaInicio.Format("2006-01-02T15:04:05Z"),
+		FechaInicio:           auto.FechaInicio.UTC().Format("2006-01-02T15:04:05Z"),
 		Estado:                strings.ToLower(string(auto.Estado)),
 		IDBodega:              auto.IDBodega,
 		IDSegmento:            auto.IDSegmento,
@@ -552,7 +506,7 @@ func (s *AutoevaluacionService) GetResultadosDetallados(ctx context.Context, idA
 	}
 
 	if auto.FechaFin != nil {
-		autoInfo.FechaFinalizacion = auto.FechaFin.Format("2006-01-02T15:04:05Z")
+		autoInfo.FechaFinalizacion = auto.FechaFin.UTC().Format("2006-01-02T15:04:05Z")
 	}
 
 	// Obtener segmento info
@@ -715,9 +669,15 @@ func (s *AutoevaluacionService) GetResultadosDetallados(ctx context.Context, idA
 	autoInfo.IndicadoresRespondidos = totalIndicadoresRespondidos
 	autoInfo.IndicadoresTotal = totalIndicadores
 
-	// Obtener responsable activo de la bodega
+	// Obtener el responsable que realizó esta evaluación (guardado al momento de crearla)
 	var respInfo *domain.ResponsableInfo
-	resp, err := s.responsableRepo.FindActivoByBodega(ctx, auto.IDBodega)
+	var resp *domain.Responsable
+	if auto.IDResponsable != nil {
+		resp, err = s.responsableRepo.FindByID(ctx, *auto.IDResponsable)
+	} else {
+		// Fallback para evaluaciones antiguas sin responsable guardado
+		resp, err = s.responsableRepo.FindActivoByBodega(ctx, auto.IDBodega)
+	}
 	if err == nil && resp != nil {
 		respInfo = &domain.ResponsableInfo{
 			Nombre:   resp.Nombre,
@@ -748,7 +708,7 @@ func (s *AutoevaluacionService) GetResultadosBodega(ctx context.Context, idBodeg
 
 	// Info de la autoevaluación
 	if auto.FechaFin != nil {
-		response.Autoevaluacion.FechaFin = auto.FechaFin.Format("2006-01-02T15:04:05Z")
+		response.Autoevaluacion.FechaFin = auto.FechaFin.UTC().Format("2006-01-02T15:04:05Z")
 	}
 	if auto.PuntajeFinal != nil {
 		response.Autoevaluacion.PuntajeFinal = *auto.PuntajeFinal

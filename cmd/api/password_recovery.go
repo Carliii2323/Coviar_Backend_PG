@@ -12,10 +12,19 @@ import (
 	"strconv"
 	"time"
 
+	"coviar_backend/internal/middleware"
+	"coviar_backend/pkg/audit"
 	"coviar_backend/pkg/httputil"
+	"coviar_backend/pkg/ratelimit"
 	"coviar_backend/pkg/router"
 
 	"golang.org/x/crypto/bcrypt"
+)
+
+// Limiters para los endpoints de recuperación de contraseña
+var (
+	resetRequestLimiter = ratelimit.New() // limita solicitudes de reset por IP
+	resetTokenLimiter   = ratelimit.New() // limita intentos de token por IP
 )
 
 type passwordResetResponse struct {
@@ -129,6 +138,15 @@ func sendResetEmail(email, token string) error {
 // RequestPasswordReset maneja POST /api/request-password-reset
 func RequestPasswordReset(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		ip := ratelimit.GetIP(r)
+		if resetRequestLimiter.IsBlocked(ip) {
+			log.Printf("🚫 IP bloqueada en recuperación de contraseña: %s", ip)
+			httputil.RespondJSON(w, http.StatusTooManyRequests, passwordResetResponse{false, "Demasiadas solicitudes, intentá de nuevo en 15 minutos"})
+			return
+		}
+		// Cada solicitud cuenta como intento para prevenir spam de emails
+		resetRequestLimiter.RecordFailure(ip)
+
 		var req passwordResetRequest
 		if err := httputil.DecodeJSON(r, &req); err != nil {
 			log.Printf("Error decodificando request: %v", err)
@@ -136,13 +154,15 @@ func RequestPasswordReset(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		log.Printf("Solicitud de recuperación para email: %s", req.Email)
+		log.Printf("Solicitud de recuperación de contraseña desde IP: %s", ip)
 
 		// Buscar usuario por email en tabla 'cuentas'
+		// IMPORTANTE: siempre responder con el mismo mensaje para evitar enumeración de usuarios
 		var userID int
 		err := db.QueryRow("SELECT id_cuenta FROM cuentas WHERE email_login = $1", req.Email).Scan(&userID)
 		if err != nil {
-			httputil.RespondJSON(w, http.StatusNotFound, passwordResetResponse{false, "El correo ingresado no está registrado en el sistema"})
+			// Email no registrado: responder igual que si existiera (no revelar si el email está en el sistema)
+			httputil.RespondJSON(w, http.StatusOK, passwordResetResponse{true, "Si el email existe, recibirás un correo de recuperación"})
 			return
 		}
 
@@ -186,6 +206,13 @@ func RequestPasswordReset(db *sql.DB) http.HandlerFunc {
 // ResetPassword maneja POST /api/reset-password
 func ResetPassword(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		ip := ratelimit.GetIP(r)
+		if resetTokenLimiter.IsBlocked(ip) {
+			log.Printf("🚫 IP bloqueada en restablecimiento de contraseña: %s", ip)
+			httputil.RespondJSON(w, http.StatusTooManyRequests, passwordResetResponse{false, "Demasiados intentos, intentá de nuevo en 15 minutos"})
+			return
+		}
+
 		var req resetPasswordRequest
 		if err := httputil.DecodeJSON(r, &req); err != nil {
 			log.Printf("Error decodificando request: %v", err)
@@ -193,8 +220,8 @@ func ResetPassword(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		if len(req.NewPassword) < 6 {
-			httputil.RespondJSON(w, http.StatusBadRequest, passwordResetResponse{false, "La contraseña debe tener al menos 6 caracteres"})
+		if len(req.NewPassword) < 8 {
+			httputil.RespondJSON(w, http.StatusBadRequest, passwordResetResponse{false, "La contraseña debe tener al menos 8 caracteres"})
 			return
 		}
 
@@ -209,6 +236,7 @@ func ResetPassword(db *sql.DB) http.HandlerFunc {
 		).Scan(&userID, &expiresAt, &used)
 
 		if err == sql.ErrNoRows {
+			resetTokenLimiter.RecordFailure(ip)
 			httputil.RespondJSON(w, http.StatusBadRequest, passwordResetResponse{false, "Token inválido"})
 			return
 		}
@@ -218,13 +246,9 @@ func ResetPassword(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		if used {
-			httputil.RespondJSON(w, http.StatusBadRequest, passwordResetResponse{false, "Este token ya fue utilizado"})
-			return
-		}
-
-		if time.Now().UTC().After(expiresAt) {
-			httputil.RespondJSON(w, http.StatusBadRequest, passwordResetResponse{false, "El token ha expirado"})
+		if used || time.Now().UTC().After(expiresAt) {
+			resetTokenLimiter.RecordFailure(ip)
+			httputil.RespondJSON(w, http.StatusBadRequest, passwordResetResponse{false, "Token inválido o expirado"})
 			return
 		}
 
@@ -258,7 +282,7 @@ type adminCambiarPasswordRequest struct {
 
 // AdminCambiarPasswordBodega maneja POST /api/admin/bodegas/{id}/cambiar-password
 // Permite al admin establecer directamente una nueva contraseña para la cuenta de una bodega
-func AdminCambiarPasswordBodega(db *sql.DB) http.HandlerFunc {
+func AdminCambiarPasswordBodega(db *sql.DB, auditLogger *audit.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idStr := router.GetParam(r, "id")
 		idBodega, err := strconv.Atoi(idStr)
@@ -273,8 +297,8 @@ func AdminCambiarPasswordBodega(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		if len(req.NuevaPassword) < 6 {
-			httputil.RespondJSON(w, http.StatusBadRequest, passwordResetResponse{false, "La contraseña debe tener al menos 6 caracteres"})
+		if len(req.NuevaPassword) < 8 {
+			httputil.RespondJSON(w, http.StatusBadRequest, passwordResetResponse{false, "La contraseña debe tener al menos 8 caracteres"})
 			return
 		}
 
@@ -312,6 +336,11 @@ func AdminCambiarPasswordBodega(db *sql.DB) http.HandlerFunc {
 			httputil.RespondJSON(w, http.StatusInternalServerError, passwordResetResponse{false, "Error al actualizar contraseña"})
 			return
 		}
+
+		ip := ratelimit.GetIP(r)
+		adminID, _ := r.Context().Value(middleware.UserIDKey).(int)
+		auditLogger.Log(r.Context(), audit.AdminCambioPassword, &adminID, ip,
+			fmt.Sprintf("bodega_id=%d cuenta_id=%d", idBodega, userID))
 
 		log.Printf("✅ Contraseña cambiada por admin para bodega %d (cuenta %d)", idBodega, userID)
 		httputil.RespondJSON(w, http.StatusOK, passwordResetResponse{true, "Contraseña actualizada correctamente"})

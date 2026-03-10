@@ -8,10 +8,14 @@ import (
 	"coviar_backend/internal/middleware"
 	"coviar_backend/internal/repository/postgres"
 	"coviar_backend/internal/service"
+	"coviar_backend/pkg/audit"
 	"coviar_backend/pkg/config"
 	"coviar_backend/pkg/database"
 	"coviar_backend/pkg/httputil"
+	"coviar_backend/pkg/jwt"
+	"coviar_backend/pkg/ratelimit"
 	"coviar_backend/pkg/router"
+	"coviar_backend/pkg/tokenblacklist"
 )
 
 func main() {
@@ -47,6 +51,13 @@ func main() {
 
 	log.Println("✓ Repositorios inicializados")
 
+	// 3b. Inicializar audit log (tabla + logger)
+	if err := audit.CreateTable(db.DB); err != nil {
+		log.Fatalf("❌ Error creando tabla audit_log: %v", err)
+	}
+	auditLogger := audit.New(db.DB)
+	log.Println("✓ Audit log inicializado")
+
 	// 4. Inicializar servicios
 	registroService := service.NewRegistroService(bodegaRepo, cuentaRepo, responsableRepo, txManager)
 	ubicacionService := service.NewUbicacionService(ubicacionRepo)
@@ -62,22 +73,28 @@ func main() {
 	// 5. Inicializar handlers (con JWT secret para autenticación)
 	registroHandler := handler.NewRegistroHandler(registroService)
 	ubicacionHandler := handler.NewUbicacionHandler(ubicacionService)
-	cuentaHandler := handler.NewCuentaHandler(cuentaService, cfg.JWT.Secret)
+	isProduction := cfg.App.Environment == "production"
+	cuentaHandler := handler.NewCuentaHandler(cuentaService, cfg.JWT.Secret, isProduction, auditLogger)
 	bodegaHandler := handler.NewBodegaHandler(bodegaService, autoevaluacionService)
-	responsableHandler := handler.NewResponsableHandler(responsableService)
-	autoevaluacionHandler := handler.NewAutoevaluacionHandler(autoevaluacionService)
+	responsableHandler := handler.NewResponsableHandler(responsableService, auditLogger)
+	autoevaluacionHandler := handler.NewAutoevaluacionHandler(autoevaluacionService, auditLogger)
 	evidenciaHandler := handler.NewEvidenciaHandler(evidenciaService)
 	adminHandler := handler.NewAdminHandler(adminService)
 
 	log.Println("✓ Handlers inicializados")
 
-	// 6. Configurar router
+	// 6. Inicializar blacklist de tokens revocados (para logout efectivo)
+	bl := tokenblacklist.New()
+
+	// 7. Configurar router
 	r := router.New()
 
 	// Middlewares globales
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recovery)
 	r.Use(middleware.CORS)
+	r.Use(middleware.CSRFProtect)
+	r.Use(middleware.RateLimit)
 
 	// ===== RUTAS PÚBLICAS =====
 
@@ -85,17 +102,38 @@ func main() {
 	r.POST("/api/registro", registroHandler.RegistrarBodega)
 	r.POST("/api/login", cuentaHandler.Login)
 
-	// Logout (elimina cookies)
+	// Logout (revoca tokens y elimina cookies)
 	r.POST("/api/logout", func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("🔓 Logout request recibido")
+		ip := ratelimit.GetIP(r)
+
+		// Revocar auth_token si existe (invalida el token aunque la cookie sea borrada)
+		var idCuenta *int
+		if cookie, err := r.Cookie("auth_token"); err == nil && cookie.Value != "" {
+			if claims, err := jwt.ValidateToken(cookie.Value, cfg.JWT.Secret); err == nil {
+				bl.Revoke(cookie.Value, claims.ExpiresAt.Time)
+				id := claims.UserID
+				idCuenta = &id
+			}
+		}
+
+		// Revocar refresh_token si existe
+		if cookie, err := r.Cookie("refresh_token"); err == nil && cookie.Value != "" {
+			if claims, err := jwt.ValidateToken(cookie.Value, cfg.JWT.Secret); err == nil {
+				bl.Revoke(cookie.Value, claims.ExpiresAt.Time)
+			}
+		}
+
+		auditLogger.Log(r.Context(), audit.Logout, idCuenta, ip, "")
 
 		// Eliminar cookie auth_token
 		http.SetCookie(w, &http.Cookie{
 			Name:     "auth_token",
 			Value:    "",
 			Path:     "/",
-			MaxAge:   -1, // Eliminar cookie
+			MaxAge:   -1,
 			HttpOnly: true,
+			Secure:   isProduction,
 			SameSite: http.SameSiteLaxMode,
 		})
 
@@ -104,12 +142,13 @@ func main() {
 			Name:     "refresh_token",
 			Value:    "",
 			Path:     "/",
-			MaxAge:   -1, // Eliminar cookie
+			MaxAge:   -1,
 			HttpOnly: true,
+			Secure:   isProduction,
 			SameSite: http.SameSiteLaxMode,
 		})
 
-		log.Printf("✅ Cookies eliminadas")
+		log.Printf("✅ Logout exitoso — tokens revocados y cookies eliminadas")
 		httputil.RespondJSON(w, http.StatusOK, map[string]string{
 			"mensaje": "Logout exitoso",
 		})
@@ -138,11 +177,16 @@ func main() {
 
 	// ===== RUTAS PROTEGIDAS (requieren autenticación) =====
 
-	authMiddleware := middleware.AuthMiddleware(cfg.JWT.Secret)
+	authMiddleware := middleware.AuthMiddleware(cfg.JWT.Secret, bl)
 
 	// Helper para convertir http.Handler a http.HandlerFunc
 	protect := func(handler http.HandlerFunc) http.HandlerFunc {
 		return authMiddleware(handler).ServeHTTP
+	}
+
+	// Helper para rutas de admin: requiere autenticación + rol ADMINISTRADOR_APP
+	protectAdmin := func(handler http.HandlerFunc) http.HandlerFunc {
+		return authMiddleware(middleware.RequireAdmin(handler)).ServeHTTP
 	}
 
 	// Cuentas (protegidas)
@@ -161,11 +205,11 @@ func main() {
 	r.GET("/api/cuentas/{cuenta_id}/responsables", protect(responsableHandler.GetByCuentaID))
 	r.POST("/api/cuentas/{cuenta_id}/responsables", protect(responsableHandler.Create))
 
-	// Admin (protegidas)
-	r.GET("/api/admin/stats", protect(adminHandler.GetStats))
-	r.GET("/api/admin/evaluaciones", protect(adminHandler.GetAllEvaluaciones))
-	r.GET("/api/admin/bodegas", protect(bodegaHandler.GetAll))
-	r.POST("/api/admin/bodegas/{id}/cambiar-password", protect(AdminCambiarPasswordBodega(db.DB)))
+	// Admin (requieren autenticación + rol administrador)
+	r.GET("/api/admin/stats", protectAdmin(adminHandler.GetStats))
+	r.GET("/api/admin/evaluaciones", protectAdmin(adminHandler.GetAllEvaluaciones))
+	r.GET("/api/admin/bodegas", protectAdmin(bodegaHandler.GetAll))
+	r.POST("/api/admin/bodegas/{id}/cambiar-password", protectAdmin(AdminCambiarPasswordBodega(db.DB, auditLogger)))
 
 	// Autoevaluaciones (protegidas) - static routes BEFORE dynamic
 	r.GET("/api/autoevaluaciones/historial", protect(autoevaluacionHandler.GetHistorialAutoevaluaciones))

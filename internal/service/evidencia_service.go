@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"coviar_backend/internal/domain"
@@ -172,6 +173,18 @@ func (s *EvidenciaService) CambiarEvidencia(ctx context.Context, idAutoevaluacio
 	return s.AgregarEvidencia(ctx, idAutoevaluacion, idRespuesta, nombreArchivo, file)
 }
 
+// VerificarPropietario verifica que la autoevaluación pertenezca a la bodega indicada.
+func (s *EvidenciaService) VerificarPropietario(ctx context.Context, idAutoevaluacion, idBodega int) error {
+	auto, err := s.autoevaluacionRepo.FindByID(ctx, idAutoevaluacion)
+	if err != nil {
+		return domain.ErrNotFound
+	}
+	if auto.IDBodega != idBodega {
+		return domain.ErrNoAutorizado
+	}
+	return nil
+}
+
 // ObtenerEvidencia obtiene la evidencia de una respuesta
 func (s *EvidenciaService) ObtenerEvidencia(ctx context.Context, idRespuesta int) (*domain.Evidencia, error) {
 	evidencia, err := s.evidenciaRepo.FindByRespuesta(ctx, idRespuesta)
@@ -242,16 +255,22 @@ func (s *EvidenciaService) DescargarTodasEvidenciasZip(ctx context.Context, idAu
 	return zipBuffer.Bytes(), nil
 }
 
-// validatePDFFile valida que el archivo sea PDF y no exceda 2MB
-// Solo valida extensión y tamaño, NO la firma (magic bytes)
+// validatePDFFile valida que el archivo sea un PDF real (magic bytes + extensión) y no exceda 2MB
 func (s *EvidenciaService) validatePDFFile(fileBytes []byte, fileName string) error {
-	if len(fileName) < 4 || fileName[len(fileName)-4:] != ".pdf" {
-		return fmt.Errorf("only PDF files are allowed")
+	// Validar extensión (case-insensitive)
+	if !strings.HasSuffix(strings.ToLower(fileName), ".pdf") {
+		return domain.ErrArchivoInvalido
 	}
 
-	maxSize := 2097152
+	// Validar magic bytes: todo PDF real comienza con "%PDF-"
+	if len(fileBytes) < 5 || string(fileBytes[:5]) != "%PDF-" {
+		return domain.ErrArchivoInvalido
+	}
+
+	// Validar tamaño máximo 2MB
+	const maxSize = 2 * 1024 * 1024
 	if len(fileBytes) > maxSize {
-		return fmt.Errorf("file size exceeds 2MB limit")
+		return domain.ErrArchivoDemasiadoGrande
 	}
 
 	return nil

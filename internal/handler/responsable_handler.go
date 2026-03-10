@@ -1,22 +1,27 @@
 package handler
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"coviar_backend/internal/domain"
 	"coviar_backend/internal/middleware"
 	"coviar_backend/internal/service"
+	"coviar_backend/pkg/audit"
 	"coviar_backend/pkg/httputil"
+	"coviar_backend/pkg/ratelimit"
 	"coviar_backend/pkg/router"
 )
 
 type ResponsableHandler struct {
 	service *service.ResponsableService
+	audit   *audit.Logger
 }
 
-func NewResponsableHandler(service *service.ResponsableService) *ResponsableHandler {
-	return &ResponsableHandler{service: service}
+func NewResponsableHandler(service *service.ResponsableService, auditLogger *audit.Logger) *ResponsableHandler {
+	return &ResponsableHandler{service: service, audit: auditLogger}
 }
 
 func (h *ResponsableHandler) GetByID(w http.ResponseWriter, r *http.Request) {
@@ -108,10 +113,18 @@ func (h *ResponsableHandler) DarDeBaja(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.service.DarDeBaja(r.Context(), id); err != nil {
+	var body struct {
+		CancelarPendientes bool `json:"cancelar_pendientes"`
+	}
+	json.NewDecoder(r.Body).Decode(&body) //nolint:errcheck
+
+	if err := h.service.DarDeBaja(r.Context(), id, body.CancelarPendientes); err != nil {
 		httputil.HandleServiceError(w, err)
 		return
 	}
+
+	ip := ratelimit.GetIP(r)
+	h.audit.Log(r.Context(), audit.BajaResponsable, &userID, ip, fmt.Sprintf("id_responsable=%d", id))
 
 	httputil.RespondJSON(w, http.StatusOK, map[string]string{"mensaje": "Responsable dado de baja exitosamente"})
 }
@@ -172,6 +185,9 @@ func (h *ResponsableHandler) Create(w http.ResponseWriter, r *http.Request) {
 		httputil.HandleServiceError(w, err)
 		return
 	}
+
+	ip := ratelimit.GetIP(r)
+	h.audit.Log(r.Context(), audit.CrearResponsable, &userID, ip, fmt.Sprintf("id_responsable=%d, id_cuenta=%d", responsable.ID, cuentaID))
 
 	httputil.RespondJSON(w, http.StatusCreated, responsable)
 }
