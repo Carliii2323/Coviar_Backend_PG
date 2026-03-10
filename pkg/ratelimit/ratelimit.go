@@ -135,7 +135,8 @@ func GetIP(r *http.Request) string {
 		return ip
 	}
 	if idx := strings.LastIndex(r.RemoteAddr, ":"); idx != -1 {
-		return r.RemoteAddr[:idx]
+		ip := r.RemoteAddr[:idx]
+		return strings.Trim(ip, "[]") // elimina corchetes de IPv6, ej: [::1] → ::1
 	}
 	return r.RemoteAddr
 }

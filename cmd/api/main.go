@@ -76,8 +76,8 @@ func main() {
 	isProduction := cfg.App.Environment == "production"
 	cuentaHandler := handler.NewCuentaHandler(cuentaService, cfg.JWT.Secret, isProduction, auditLogger)
 	bodegaHandler := handler.NewBodegaHandler(bodegaService, autoevaluacionService)
-	responsableHandler := handler.NewResponsableHandler(responsableService)
-	autoevaluacionHandler := handler.NewAutoevaluacionHandler(autoevaluacionService)
+	responsableHandler := handler.NewResponsableHandler(responsableService, auditLogger)
+	autoevaluacionHandler := handler.NewAutoevaluacionHandler(autoevaluacionService, auditLogger)
 	evidenciaHandler := handler.NewEvidenciaHandler(evidenciaService)
 	adminHandler := handler.NewAdminHandler(adminService)
 

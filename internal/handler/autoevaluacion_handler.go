@@ -1,21 +1,26 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
 	"coviar_backend/internal/domain"
+	"coviar_backend/internal/middleware"
 	"coviar_backend/internal/service"
+	"coviar_backend/pkg/audit"
 	"coviar_backend/pkg/httputil"
+	"coviar_backend/pkg/ratelimit"
 	"coviar_backend/pkg/router"
 )
 
 type AutoevaluacionHandler struct {
 	service *service.AutoevaluacionService
+	audit   *audit.Logger
 }
 
-func NewAutoevaluacionHandler(service *service.AutoevaluacionService) *AutoevaluacionHandler {
-	return &AutoevaluacionHandler{service: service}
+func NewAutoevaluacionHandler(service *service.AutoevaluacionService, auditLogger *audit.Logger) *AutoevaluacionHandler {
+	return &AutoevaluacionHandler{service: service, audit: auditLogger}
 }
 
 // CreateAutoevaluacion POST /api/autoevaluaciones
@@ -31,6 +36,14 @@ func (h *AutoevaluacionHandler) CreateAutoevaluacion(w http.ResponseWriter, r *h
 		httputil.HandleServiceError(w, err)
 		return
 	}
+
+	idCuenta, _ := r.Context().Value(middleware.UserIDKey).(int)
+	ip := ratelimit.GetIP(r)
+	idAuto := 0
+	if response.AutoevaluacionPendiente != nil {
+		idAuto = response.AutoevaluacionPendiente.ID
+	}
+	h.audit.Log(r.Context(), audit.CrearAutoevaluacion, &idCuenta, ip, fmt.Sprintf("id_autoevaluacion=%d, id_bodega=%d", idAuto, req.IDBodega))
 
 	// Si hay una autoevaluación pendiente, retornar con código 200
 	// Si se creó una nueva, retornar con código 201
@@ -134,6 +147,10 @@ func (h *AutoevaluacionHandler) CompletarAutoevaluacion(w http.ResponseWriter, r
 		return
 	}
 
+	idCuenta, _ := r.Context().Value(middleware.UserIDKey).(int)
+	ip := ratelimit.GetIP(r)
+	h.audit.Log(r.Context(), audit.CompletarAutoevaluacion, &idCuenta, ip, fmt.Sprintf("id_autoevaluacion=%d", id))
+
 	httputil.RespondJSON(w, http.StatusOK, map[string]string{"mensaje": "Autoevaluación completada correctamente"})
 }
 
@@ -150,6 +167,10 @@ func (h *AutoevaluacionHandler) CancelarAutoevaluacion(w http.ResponseWriter, r 
 		httputil.HandleServiceError(w, err)
 		return
 	}
+
+	idCuenta, _ := r.Context().Value(middleware.UserIDKey).(int)
+	ip := ratelimit.GetIP(r)
+	h.audit.Log(r.Context(), audit.CancelarAutoevaluacion, &idCuenta, ip, fmt.Sprintf("id_autoevaluacion=%d", id))
 
 	httputil.RespondJSON(w, http.StatusOK, map[string]string{"mensaje": "Autoevaluación cancelada correctamente"})
 }
