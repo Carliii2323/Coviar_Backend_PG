@@ -72,6 +72,12 @@ func main() {
 
 	// 5. Inicializar handlers (con JWT secret para autenticación)
 	registroHandler := handler.NewRegistroHandler(registroService)
+	// Conectar envío de email de verificación al registro
+	registroHandler.SetEmailSender(func(cuentaID int, email string) {
+		if err := SendVerificationCode(db.DB, cuentaID, email); err != nil {
+			log.Printf("⚠️  Error enviando código de verificación a %s: %v", email, err)
+		}
+	})
 	ubicacionHandler := handler.NewUbicacionHandler(ubicacionService)
 	isProduction := cfg.App.Environment == "production"
 	cuentaHandler := handler.NewCuentaHandler(cuentaService, cfg.JWT.Secret, isProduction, auditLogger)
@@ -162,6 +168,10 @@ func main() {
 	// Recuperación de contraseña (públicas)
 	r.POST("/api/recuperar-password", RequestPasswordReset(db.DB))
 	r.POST("/api/restablecer-password", ResetPassword(db.DB))
+
+	// Verificación de correo (públicas)
+	r.POST("/api/verificar-correo", VerificarCorreo(db.DB))
+	r.POST("/api/reenviar-codigo-verificacion", ReenviarCodigoVerificacion(db.DB))
 
 	// Iniciar limpieza de tokens expirados en background
 	go cleanExpiredTokens(db.DB)

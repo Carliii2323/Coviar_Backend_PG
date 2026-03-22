@@ -9,11 +9,18 @@ import (
 )
 
 type RegistroHandler struct {
-	service *service.RegistroService
+	service     *service.RegistroService
+	emailSender func(cuentaID int, email string)
 }
 
 func NewRegistroHandler(service *service.RegistroService) *RegistroHandler {
 	return &RegistroHandler{service: service}
+}
+
+// SetEmailSender configura el hook que se invoca tras un registro exitoso
+// para enviar el email de verificación. Se llama de forma asíncrona.
+func (h *RegistroHandler) SetEmailSender(fn func(cuentaID int, email string)) {
+	h.emailSender = fn
 }
 
 func (h *RegistroHandler) RegistrarBodega(w http.ResponseWriter, r *http.Request) {
@@ -27,6 +34,11 @@ func (h *RegistroHandler) RegistrarBodega(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		httputil.HandleServiceError(w, err)
 		return
+	}
+
+	// Disparar envío de email de verificación en segundo plano
+	if h.emailSender != nil {
+		go h.emailSender(resp.IDCuenta, req.Cuenta.EmailLogin)
 	}
 
 	httputil.RespondJSON(w, http.StatusCreated, resp)
