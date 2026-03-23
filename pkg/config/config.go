@@ -41,7 +41,7 @@ type AppConfig struct {
 func Load() (*Config, error) {
 	// Cargar .env (opcional)
 	if err := godotenv.Load(); err != nil {
-		log.Println("⚠️  No se encontró .env, usando variables del sistema")
+		log.Println("[CONFIG] No se encontró .env, usando variables del sistema")
 	}
 
 	cfg := &Config{

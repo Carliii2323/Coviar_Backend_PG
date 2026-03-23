@@ -111,7 +111,7 @@ func sendResetEmail(email, token string) error {
 						</div>
 						<p style="font-size:13px; color:#777;">Si el botón no funciona, copiá y pegá este enlace en tu navegador:</p>
 						<div class="link-box">%s</div>
-						<p class="expiry">⏱ Este enlace expirará en 1 hora.</p>
+						<p class="expiry">Este enlace expirará en 1 hora.</p>
 					</div>
 					<div class="footer">
 						<p>Si no solicitaste este cambio, podés ignorar este correo.</p>
@@ -131,7 +131,7 @@ func sendResetEmail(email, token string) error {
 		return fmt.Errorf("error enviando email: %v", err)
 	}
 
-	log.Printf("✅ Email de recuperación enviado a %s", email)
+	log.Printf("[EMAIL] Recuperación de contraseña enviada a %s", email)
 	return nil
 }
 
@@ -140,7 +140,7 @@ func RequestPasswordReset(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ip := ratelimit.GetIP(r)
 		if resetRequestLimiter.IsBlocked(ip) {
-			log.Printf("🚫 IP bloqueada en recuperación de contraseña: %s", ip)
+			log.Printf("[RATE LIMIT] IP bloqueada en recuperación de contraseña: %s", ip)
 			httputil.RespondJSON(w, http.StatusTooManyRequests, passwordResetResponse{false, "Demasiadas solicitudes, intentá de nuevo en 15 minutos"})
 			return
 		}
@@ -208,7 +208,7 @@ func ResetPassword(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ip := ratelimit.GetIP(r)
 		if resetTokenLimiter.IsBlocked(ip) {
-			log.Printf("🚫 IP bloqueada en restablecimiento de contraseña: %s", ip)
+			log.Printf("[RATE LIMIT] IP bloqueada en restablecimiento de contraseña: %s", ip)
 			httputil.RespondJSON(w, http.StatusTooManyRequests, passwordResetResponse{false, "Demasiados intentos, intentá de nuevo en 15 minutos"})
 			return
 		}
@@ -342,7 +342,7 @@ func AdminCambiarPasswordBodega(db *sql.DB, auditLogger *audit.Logger) http.Hand
 		auditLogger.Log(r.Context(), audit.AdminCambioPassword, &adminID, ip,
 			fmt.Sprintf("bodega_id=%d cuenta_id=%d", idBodega, userID))
 
-		log.Printf("✅ Contraseña cambiada por admin para bodega %d (cuenta %d)", idBodega, userID)
+		log.Printf("[ADMIN] Contraseña cambiada para bodega %d (cuenta %d)", idBodega, userID)
 		httputil.RespondJSON(w, http.StatusOK, passwordResetResponse{true, "Contraseña actualizada correctamente"})
 	}
 }

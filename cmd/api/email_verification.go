@@ -124,7 +124,7 @@ func sendVerificationEmail(email, codigo string) error {
         <div class="code-box">
           <div class="code">%s</div>
         </div>
-        <p class="expiry">⏱ Este código expira en 5 minutos.</p>
+        <p class="expiry">Este código expira en 5 minutos.</p>
         <p style="font-size:13px; color:#777;">Si no creaste una cuenta en COVIAR, podés ignorar este correo.</p>
       </div>
       <div class="footer">
@@ -143,7 +143,7 @@ func sendVerificationEmail(email, codigo string) error {
 		return fmt.Errorf("error enviando email de verificación: %w", err)
 	}
 
-	log.Printf("✅ Email de verificación enviado a %s", email)
+	log.Printf("[EMAIL] Verificación enviada a %s", email)
 	return nil
 }
 
@@ -151,7 +151,7 @@ func sendVerificationEmail(email, codigo string) error {
 // Es exportada para ser invocada desde el hook del handler de registro.
 func SendVerificationCode(db *sql.DB, cuentaID int, email string) error {
 	if _, err := db.Exec("DELETE FROM verificacion_correo WHERE cuenta_id = $1", cuentaID); err != nil {
-		log.Printf("⚠️  No se pudieron limpiar códigos anteriores para cuenta %d: %v", cuentaID, err)
+		log.Printf("[WARN] No se pudieron limpiar códigos anteriores para cuenta %d: %v", cuentaID, err)
 	}
 
 	codigo := generateVerificationCode()
@@ -174,7 +174,7 @@ func VerificarCorreo(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ip := ratelimit.GetIP(r)
 		if verificacionLimiter.IsBlocked(ip) {
-			log.Printf("🚫 IP bloqueada en verificación de correo: %s", ip)
+			log.Printf("[RATE LIMIT] IP bloqueada en verificación de correo: %s", ip)
 			httputil.RespondJSON(w, http.StatusTooManyRequests, verificarCorreoResponse{
 				false, "Demasiados intentos, esperá unos minutos e intentá nuevamente",
 			})
@@ -292,7 +292,7 @@ func VerificarCorreo(db *sql.DB) http.HandlerFunc {
 			cuentaID,
 		)
 
-		log.Printf("✅ Correo verificado para cuenta %d (%s)", cuentaID, req.Email)
+		log.Printf("[VERIFICACION] Correo verificado para cuenta %d (%s)", cuentaID, req.Email)
 		httputil.RespondJSON(w, http.StatusOK, verificarCorreoResponse{true, "Correo verificado correctamente"})
 	}
 }
@@ -306,7 +306,7 @@ func ReenviarCodigoVerificacion(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ip := ratelimit.GetIP(r)
 		if verificacionLimiter.IsBlocked(ip) {
-			log.Printf("🚫 IP bloqueada en reenvío de código: %s", ip)
+			log.Printf("[RATE LIMIT] IP bloqueada en reenvío de código: %s", ip)
 			httputil.RespondJSON(w, http.StatusTooManyRequests, reenvioResponse{
 				false, "Demasiadas solicitudes, intentá de nuevo más tarde", 0,
 			})
@@ -397,7 +397,7 @@ func ReenviarCodigoVerificacion(db *sql.DB) http.HandlerFunc {
 				     bloqueado_hasta = EXCLUDED.bloqueado_hasta`,
 				cuentaID, newIntentos, bloqueadoHastaTime,
 			)
-			log.Printf("🔒 Cuenta %d bloqueada 24 h por exceso de reenvíos (intento %d)", cuentaID, newIntentos)
+			log.Printf("[BLOQUEO] Cuenta %d bloqueada 24 h por exceso de reenvíos (intento %d)", cuentaID, newIntentos)
 			httputil.RespondJSON(w, http.StatusTooManyRequests, reenvioResponse{
 				false,
 				"Demasiados intentos de reenvío. Tu cuenta está bloqueada por 24 horas.",
@@ -434,7 +434,7 @@ func ReenviarCodigoVerificacion(db *sql.DB) http.HandlerFunc {
 		}
 
 		segsEspera := int(nextDelay.Seconds())
-		log.Printf("✅ Código reenviado a %s (intento %d/%d, próximo en %s)",
+		log.Printf("[REENVIO] Código enviado a %s (intento %d/%d, próximo en %s)",
 			req.Email, newIntentos, len(reenvioDelays), nextDelay)
 		httputil.RespondJSON(w, http.StatusOK, reenvioResponse{
 			true, "Código reenviado correctamente", segsEspera,

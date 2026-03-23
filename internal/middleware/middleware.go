@@ -67,7 +67,7 @@ func CSRFProtect(next http.Handler) http.Handler {
 					return
 				}
 			}
-			log.Printf("🚫 CSRF bloqueado — Origin no permitido: %s", origin)
+			log.Printf("[CSRF] Bloqueado — Origin no permitido: %s", origin)
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusForbidden)
 			w.Write([]byte(`{"error":"origen no permitido"}`))
@@ -78,7 +78,7 @@ func CSRFProtect(next http.Handler) http.Handler {
 		if referer := r.Header.Get("Referer"); referer != "" {
 			parsed, err := url.Parse(referer)
 			if err != nil {
-				log.Printf("🚫 CSRF bloqueado — Referer inválido: %s", referer)
+				log.Printf("[CSRF] Bloqueado — Referer inválido: %s", referer)
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusForbidden)
 				w.Write([]byte(`{"error":"origen no permitido"}`))
@@ -91,7 +91,7 @@ func CSRFProtect(next http.Handler) http.Handler {
 					return
 				}
 			}
-			log.Printf("🚫 CSRF bloqueado — Referer no permitido: %s", refOrigin)
+			log.Printf("[CSRF] Bloqueado — Referer no permitido: %s", refOrigin)
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusForbidden)
 			w.Write([]byte(`{"error":"origen no permitido"}`))
@@ -159,7 +159,7 @@ func RateLimit(next http.Handler) http.Handler {
 		ip := ratelimit.GetIP(r)
 
 		if !globalLimiter.Allow(ip) {
-			log.Printf("🚦 Rate limit global excedido por IP: %s", ip)
+			log.Printf("[RATE LIMIT] Global excedido por IP: %s", ip)
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusTooManyRequests)
 			w.Write([]byte(`{"error":"demasiadas solicitudes, intentá de nuevo en un minuto"}`))
@@ -168,7 +168,7 @@ func RateLimit(next http.Handler) http.Handler {
 
 		if r.Method == http.MethodPost || r.Method == http.MethodPut || r.Method == http.MethodDelete {
 			if !writeLimiter.Allow(ip) {
-				log.Printf("🚦 Rate limit de escritura excedido por IP: %s", ip)
+				log.Printf("[RATE LIMIT] Escritura excedida por IP: %s", ip)
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusTooManyRequests)
 				w.Write([]byte(`{"error":"demasiadas operaciones de escritura, intentá de nuevo en un minuto"}`))
@@ -201,7 +201,7 @@ func AuthMiddleware(jwtSecret string, bl *tokenblacklist.Blacklist) func(http.Ha
 			// Obtener cookie de auth_token
 			cookie, err := r.Cookie("auth_token")
 			if err != nil {
-				log.Printf("❌ No se encontró cookie auth_token: %v", err)
+				log.Printf("[AUTH] Cookie auth_token no encontrada: %v", err)
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusUnauthorized)
 				w.Write([]byte(`{"error":"no autenticado"}`))
@@ -210,7 +210,7 @@ func AuthMiddleware(jwtSecret string, bl *tokenblacklist.Blacklist) func(http.Ha
 
 			// Verificar si el token fue revocado (logout previo)
 			if bl.IsRevoked(cookie.Value) {
-				log.Printf("❌ Token revocado (sesión cerrada)")
+				log.Printf("[AUTH] Token revocado (sesión cerrada)")
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusUnauthorized)
 				w.Write([]byte(`{"error":"sesión cerrada, iniciá sesión nuevamente"}`))
@@ -219,7 +219,7 @@ func AuthMiddleware(jwtSecret string, bl *tokenblacklist.Blacklist) func(http.Ha
 
 			// Verificar inactividad: si pasó más de 1h sin requests, cerrar sesión
 			if bl.IsInactive(cookie.Value) {
-				log.Printf("⏱ Sesión expirada por inactividad")
+				log.Printf("[AUTH] Sesión expirada por inactividad")
 				bl.Revoke(cookie.Value, time.Now().Add(24*time.Hour)) // revocar para limpiar
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusUnauthorized)
@@ -230,7 +230,7 @@ func AuthMiddleware(jwtSecret string, bl *tokenblacklist.Blacklist) func(http.Ha
 			// Validar token
 			claims, err := jwt.ValidateToken(cookie.Value, jwtSecret)
 			if err != nil {
-				log.Printf("❌ Token inválido: %v", err)
+				log.Printf("[AUTH] Token inválido: %v", err)
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusUnauthorized)
 				w.Write([]byte(`{"error":"token inválido o expirado"}`))
@@ -243,7 +243,7 @@ func AuthMiddleware(jwtSecret string, bl *tokenblacklist.Blacklist) func(http.Ha
 			ctx = context.WithValue(ctx, UserTipoKey, claims.TipoCuenta)
 			ctx = context.WithValue(ctx, BodegaIDKey, claims.BodegaID)
 
-			log.Printf("✅ Usuario autenticado: ID=%d, Email=%s", claims.UserID, claims.Email)
+			log.Printf("[AUTH] Usuario autenticado: ID=%d, Email=%s", claims.UserID, claims.Email)
 
 			// Actualizar timestamp de actividad (reinicia el contador de inactividad)
 			bl.RecordActivity(cookie.Value)

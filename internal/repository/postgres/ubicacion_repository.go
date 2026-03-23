@@ -96,7 +96,6 @@ func (r *UbicacionRepository) GetDepartamentoByID(ctx context.Context, id int) (
 }
 
 func (r *UbicacionRepository) GetDepartamentosByProvinciaID(ctx context.Context, provinciaID int) ([]*domain.Departamento, error) {
-	// ✅ LÍNEA 99 CORREGIDA
 	query := `SELECT id_departamento, id_provincia, nombre FROM departamentos WHERE id_provincia = $1 ORDER BY nombre`
 
 	rows, err := r.db.QueryContext(ctx, query, provinciaID)
@@ -157,7 +156,6 @@ func (r *UbicacionRepository) GetLocalidadByID(ctx context.Context, id int) (*do
 }
 
 func (r *UbicacionRepository) GetLocalidadesByDepartamentoID(ctx context.Context, departamentoID int) ([]*domain.Localidad, error) {
-	// ✅ LÍNEA 165 CORREGIDA
 	query := `SELECT id_localidad, id_departamento, nombre FROM localidades WHERE id_departamento = $1 ORDER BY nombre`
 
 	rows, err := r.db.QueryContext(ctx, query, departamentoID)
