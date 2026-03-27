@@ -22,17 +22,17 @@ func main() {
 	// 1. Cargar configuración
 	cfg, err := config.Load()
 	if err != nil {
-		log.Fatalf("❌ Error cargando configuración: %v", err)
+		log.Fatalf("[ERROR] Cargando configuración: %v", err)
 	}
-	log.Println("✓ Configuración cargada")
+	log.Println("[OK] Configuración cargada")
 
 	// 2. Conectar a PostgreSQL local
 	db, err := database.ConnectPostgres(cfg.DB.Host, cfg.DB.Port, cfg.DB.User, cfg.DB.Password, cfg.DB.Name)
 	if err != nil {
-		log.Fatalf("❌ Error conectando a PostgreSQL: %v", err)
+		log.Fatalf("[ERROR] Conectando a PostgreSQL: %v", err)
 	}
 	defer db.Close()
-	log.Println("✓ Conexión a PostgreSQL local establecida")
+	log.Println("[OK] Conexión a PostgreSQL local establecida")
 
 	// 3. Inicializar repositorios
 	bodegaRepo := postgres.NewBodegaRepository(db.DB)
@@ -49,14 +49,14 @@ func main() {
 	evidenciaRepo := postgres.NewEvidenciaRepository(db.DB)
 	adminRepo := postgres.NewAdminRepository(db.DB)
 
-	log.Println("✓ Repositorios inicializados")
+	log.Println("[OK] Repositorios inicializados")
 
 	// 3b. Inicializar audit log (tabla + logger)
 	if err := audit.CreateTable(db.DB); err != nil {
-		log.Fatalf("❌ Error creando tabla audit_log: %v", err)
+		log.Fatalf("[ERROR] Creando tabla audit_log: %v", err)
 	}
 	auditLogger := audit.New(db.DB)
-	log.Println("✓ Audit log inicializado")
+	log.Println("[OK] Audit log inicializado")
 
 	// 4. Inicializar servicios
 	registroService := service.NewRegistroService(bodegaRepo, cuentaRepo, responsableRepo, txManager)
@@ -68,10 +68,16 @@ func main() {
 	evidenciaService := service.NewEvidenciaService(evidenciaRepo, respuestaRepo, autoevaluacionRepo, bodegaRepo, indicadorRepo)
 	adminService := service.NewAdminService(adminRepo)
 
-	log.Println("✓ Servicios inicializados")
+	log.Println("[OK] Servicios inicializados")
 
 	// 5. Inicializar handlers (con JWT secret para autenticación)
 	registroHandler := handler.NewRegistroHandler(registroService)
+	// Conectar envío de email de verificación al registro
+	registroHandler.SetEmailSender(func(cuentaID int, email string) {
+		if err := SendVerificationCode(db.DB, cuentaID, email); err != nil {
+			log.Printf("[WARN] Error enviando código de verificación a %s: %v", email, err)
+		}
+	})
 	ubicacionHandler := handler.NewUbicacionHandler(ubicacionService)
 	isProduction := cfg.App.Environment == "production"
 	cuentaHandler := handler.NewCuentaHandler(cuentaService, cfg.JWT.Secret, isProduction, auditLogger)
@@ -81,7 +87,7 @@ func main() {
 	evidenciaHandler := handler.NewEvidenciaHandler(evidenciaService)
 	adminHandler := handler.NewAdminHandler(adminService)
 
-	log.Println("✓ Handlers inicializados")
+	log.Println("[OK] Handlers inicializados")
 
 	// 6. Inicializar blacklist de tokens revocados (para logout efectivo)
 	bl := tokenblacklist.New()
@@ -104,7 +110,7 @@ func main() {
 
 	// Logout (revoca tokens y elimina cookies)
 	r.POST("/api/logout", func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("🔓 Logout request recibido")
+		log.Printf("[LOGOUT] Request recibido")
 		ip := ratelimit.GetIP(r)
 
 		// Revocar auth_token si existe (invalida el token aunque la cookie sea borrada)
@@ -148,7 +154,7 @@ func main() {
 			SameSite: http.SameSiteLaxMode,
 		})
 
-		log.Printf("✅ Logout exitoso — tokens revocados y cookies eliminadas")
+		log.Printf("[LOGOUT] Exitoso — tokens revocados y cookies eliminadas")
 		httputil.RespondJSON(w, http.StatusOK, map[string]string{
 			"mensaje": "Logout exitoso",
 		})
@@ -162,6 +168,10 @@ func main() {
 	// Recuperación de contraseña (públicas)
 	r.POST("/api/recuperar-password", RequestPasswordReset(db.DB))
 	r.POST("/api/restablecer-password", ResetPassword(db.DB))
+
+	// Verificación de correo (públicas)
+	r.POST("/api/verificar-correo", VerificarCorreo(db.DB))
+	r.POST("/api/reenviar-codigo-verificacion", ReenviarCodigoVerificacion(db.DB))
 
 	// Iniciar limpieza de tokens expirados en background
 	go cleanExpiredTokens(db.DB)
@@ -231,14 +241,14 @@ func main() {
 
 	// 7. Iniciar servidor
 	addr := cfg.Server.Host + ":" + cfg.Server.Port
-	log.Printf("🚀 Servidor iniciando en http://%s", addr)
-	log.Printf("📍 Entorno: %s", cfg.App.Environment)
-	log.Printf("🗄️  Base de datos: %s@%s:%s/%s", cfg.DB.User, cfg.DB.Host, cfg.DB.Port, cfg.DB.Name)
-	log.Printf("🔐 JWT Secret configurado: %s", maskSecret(cfg.JWT.Secret))
-	log.Printf("🍪 Autenticación basada en cookies HttpOnly habilitada")
+	log.Printf("[SERVER] Iniciando en http://%s", addr)
+	log.Printf("[SERVER] Entorno: %s", cfg.App.Environment)
+	log.Printf("[SERVER] Base de datos: %s@%s:%s/%s", cfg.DB.User, cfg.DB.Host, cfg.DB.Port, cfg.DB.Name)
+	log.Printf("[SERVER] JWT Secret configurado: %s", maskSecret(cfg.JWT.Secret))
+	log.Printf("[SERVER] Autenticación basada en cookies HttpOnly habilitada")
 
 	if err := http.ListenAndServe(addr, r); err != nil {
-		log.Fatalf("❌ Error iniciando servidor: %v", err)
+		log.Fatalf("[ERROR] Iniciando servidor: %v", err)
 	}
 }
 

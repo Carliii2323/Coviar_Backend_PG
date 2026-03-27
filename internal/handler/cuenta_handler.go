@@ -35,34 +35,34 @@ func NewCuentaHandler(service *service.CuentaService, jwtSecret string, isProduc
 }
 
 func (h *CuentaHandler) Login(w http.ResponseWriter, r *http.Request) {
-	log.Printf("🔐 Login request recibido")
+	log.Printf("[LOGIN] Request recibido")
 
 	ip := ratelimit.GetIP(r)
 	if h.limiter.IsBlocked(ip) {
-		log.Printf("🚫 IP bloqueada por exceso de intentos: %s", ip)
+		log.Printf("[RATE LIMIT] IP bloqueada por exceso de intentos: %s", ip)
 		httputil.RespondError(w, http.StatusTooManyRequests, "demasiados intentos fallidos, intentá de nuevo en 15 minutos")
 		return
 	}
 
 	var req domain.CuentaRequest
 	if err := httputil.DecodeJSON(r, &req); err != nil {
-		log.Printf("❌ Error decodificando JSON: %v", err)
+		log.Printf("[LOGIN] Error decodificando JSON: %v", err)
 		httputil.RespondError(w, http.StatusBadRequest, "JSON inválido")
 		return
 	}
 
-	log.Printf("🔐 Intento de login desde IP: %s", ip)
+	log.Printf("[LOGIN] Intento desde IP: %s", ip)
 
 	cuenta, err := h.service.Login(r.Context(), &req)
 	if err != nil {
-		log.Printf("❌ Error en login: %v", err)
+		log.Printf("[LOGIN] Error: %v", err)
 		h.limiter.RecordFailure(ip)
 		h.audit.Log(r.Context(), audit.LoginFallido, nil, ip, "")
 		httputil.HandleServiceError(w, err)
 		return
 	}
 
-	log.Printf("✅ Login exitoso para cuenta ID: %d", cuenta.ID)
+	log.Printf("[LOGIN] Exitoso para cuenta ID: %d", cuenta.ID)
 	h.limiter.RecordSuccess(ip)
 	h.audit.Log(r.Context(), audit.LoginExitoso, &cuenta.ID, ip, "")
 
@@ -81,7 +81,7 @@ func (h *CuentaHandler) Login(w http.ResponseWriter, r *http.Request) {
 		bodegaID,
 	)
 	if err != nil {
-		log.Printf("❌ Error generando access token: %v", err)
+		log.Printf("[LOGIN] Error generando access token: %v", err)
 		httputil.RespondError(w, http.StatusInternalServerError, "Error generando token")
 		return
 	}
@@ -95,7 +95,7 @@ func (h *CuentaHandler) Login(w http.ResponseWriter, r *http.Request) {
 		bodegaID,
 	)
 	if err != nil {
-		log.Printf("❌ Error generando refresh token: %v", err)
+		log.Printf("[LOGIN] Error generando refresh token: %v", err)
 		httputil.RespondError(w, http.StatusInternalServerError, "Error generando refresh token")
 		return
 	}
@@ -122,7 +122,7 @@ func (h *CuentaHandler) Login(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteLaxMode,
 	})
 
-	log.Printf("🍪 Cookies establecidas para cuenta ID: %d", cuenta.ID)
+	log.Printf("[LOGIN] Cookies establecidas para cuenta ID: %d", cuenta.ID)
 
 	// Responder con datos de la cuenta (sin incluir tokens en JSON)
 	httputil.RespondJSON(w, http.StatusOK, cuenta)

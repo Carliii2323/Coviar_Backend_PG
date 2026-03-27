@@ -53,7 +53,7 @@ func (r *SegmentoRepository) FindByID(ctx context.Context, id int) (*domain.Segm
 	return seg, nil
 }
 
-func (r *SegmentoRepository) FindNivelesSostenibilidadBySegmento(ctx context.Context, idSegmento int) ([]*domain.NivelSostenibilidad, error) {  // ✅ NUEVO MÉTODO COMPLETO
+func (r *SegmentoRepository) FindNivelesSostenibilidadBySegmento(ctx context.Context, idSegmento int) ([]*domain.NivelSostenibilidad, error) {
 	query := `
 		SELECT id_nivel_sostenibilidad, id_segmento, nombre, min_puntaje, max_puntaje 
 		FROM niveles_sostenibilidad 
